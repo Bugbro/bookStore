@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import { genJWTandSetCookies } from "../utils/genJWTandSetCookies.js";
-import { hashValue } from "../utils/hash.js";
+import { compareHash, hashValue } from "../utils/hash.js";
 import { resHandler } from "../utils/resHandler.js";
 
 export const registerUser = async (req, res) => {
@@ -14,10 +14,11 @@ export const registerUser = async (req, res) => {
         if(existUser) return resHandler(res, 400, "Email or Phone Number already register. Please Login.");
         //hash password
         const hashPassword = await hashValue(password);
+        console.log(hashPassword);
         const user = await User.create({
             name,
             email,
-            hashPassword
+            password:hashPassword
         });
         console.log("User after create", user);
 
@@ -25,6 +26,22 @@ export const registerUser = async (req, res) => {
         return resHandler(res, 201, "User register successfully");
     } catch (error) {
         console.log("Error while register user", error.message);
+        return resHandler(res, 500, error.message);
+    }
+};
+
+export const loginUser = async (req, res) => {
+    try {
+        const {email, password}= req.body || {};
+        if(!email || !password) return resHandler(res, 400, "Please provide all fields.");
+        const user = await User.findOne({email});
+        if(!user) return resHandler(res, 400, "Email not found.");
+        const isMatch = await compareHash(password, user.password);
+        if(!isMatch) return resHandler(res, 400, "Password does not match" );
+        genJWTandSetCookies(res, user._id, user.role);
+        return resHandler(res, 200, "User login successfully");
+    } catch (error) {
+        console.log("Error while login user", error.message);
         return resHandler(res, 500, error.message);
     }
 }
