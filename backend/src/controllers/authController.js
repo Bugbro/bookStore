@@ -44,4 +44,32 @@ export const loginUser = async (req, res) => {
         console.log("Error while login user", error.message);
         return resHandler(res, 500, error.message);
     }
+};
+
+//login functionality for admin
+export const adminLogin = async(req, res)=>{
+    try {
+        const {email, password}= req.body || {};
+        if(!email || !password) return resHandler(res, 400, "Please provide all fields.");
+        const user = await User.findOne({email});
+        if(!user) return resHandler(res, 400, "Email not found.");
+        if(user.role !== "admin") return resHandler(res, 400, "You are not authorized to login as admin.");
+        const isMatch = await compareHash(password, user.password);
+        if(!isMatch) return resHandler(res, 400, "Password does not match" );
+        genJWTandSetCookies(res, user._id, user.role);
+        return resHandler(res, 200, "Admin login successfully");
+    } catch (error) {
+        console.log("Error while login admin", error.message);
+        return resHandler(res, 500, error.message);
+    }
+};
+
+export const logoutUser = async (req, res)=>{
+    try {
+        res.clearCookie("token");
+        return resHandler(res, 200, "User logout successfully");
+    } catch (error) {
+        console.log("Error while logout user", error.message);
+        return resHandler(res, 500, error.message);
+    }
 }
