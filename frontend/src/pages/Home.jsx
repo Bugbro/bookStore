@@ -4,6 +4,7 @@ import Card from "../components/Card.jsx";
 import OurFavCards from "../components/OurFavCards.jsx";
 import FiveColCard from "../components/FiveColCard.jsx";
 import ServiceBar from "../components/ServiceBar.jsx";
+import Footer from "../components/Footer.jsx";
 
 const Home = () => {
   return (
@@ -36,6 +37,7 @@ const Home = () => {
       <OurFavCards/>
       <FiveColCard/>
       <ServiceBar/>
+      <Footer/>
     </div>
   );
 };
