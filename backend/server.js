@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/cart", cartRouter);
-app.use("/api//books", bookRouter);
+app.use("/api/books", bookRouter);
 
 app.listen(PORT, ()=>{
     console.log(`Server is running at ${PORT}`);

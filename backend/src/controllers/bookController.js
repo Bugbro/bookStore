@@ -1,26 +1,56 @@
 import Book from "../models/Book.js";
 import { resHandler } from "../utils/resHandler.js"
+import {v2 as cloudinary} from "cloudinary";
+import fs from "fs";
 
 //for admin
 export const createBook = async (req, res) => {
-    try {
-        const {title, author, price, discount, category, images, description, stock} = req.body || {};
-        if(!title || !author || !price || !category || !images || !description || !stock) return resHandler(res, 400, "Please provide all required fields.");
-        const book = await Book.create({
-            title,
-            author,
-            price,
-            discount,
-            category,
-            images,
-            description,
-            stock
-        });
-        return resHandler(res, 201, "Book created successfully", book);
-    } catch (error) {
-        console.log("Error while created book", error.message);
-        return resHandler(res, 500, error.message)
+  try {
+
+    const { title, author, price, discount, category, description, stock } = req.body || {};
+
+    
+    if (!title || !author || !price || !category || !description || !stock) {
+      return resHandler(res, 400, "Please provide all required fields.");
     }
+
+    const image1 = req.files?.image1?.[0];
+    const image2 = req.files?.image2?.[0];
+    const image3 = req.files?.image3?.[0];
+    const image4 = req.files?.image4?.[0];
+
+    const images = [image1, image2, image3, image4].filter(Boolean);
+
+    let imagesUrl = await Promise.all(
+      images.map(async (item) => {
+
+        const result = await cloudinary.uploader.upload(item.path, {
+          resource_type: "image",
+          folder: "books"
+        });
+
+        fs.unlinkSync(item.path);
+        return result.secure_url;
+      })
+    );
+
+    const book = await Book.create({
+      title,
+      author,
+      price,
+      discount,
+      category,
+      images: imagesUrl,
+      description,
+      stock
+    });
+
+    return resHandler(res, 201, "Book created successfully", book);
+
+  } catch (error) {
+    console.log("Error while creating book", error);
+    return resHandler(res, 500, error.message);
+  }
 };
 
 export const deleteBook = async(req, res)=>{
@@ -56,8 +86,8 @@ export const updateBook = async(req, res)=>{
 //for all
 export const getBooks = async(req, res)=>{
     try {
-        const books = (await Book.find()).sort({createdAt: -1});
-        if(!books) return resHandler(res, 404, "Books not found.");
+        const books = await Book.find().sort({createdAt: -1});
+        if(!books || books.length === 0) return resHandler(res, 404, "Books not found.");
         return resHandler(res, 200, "Books get successfully", books);
     } catch (error) {
         console.log("Error while getting  book", error.message);
