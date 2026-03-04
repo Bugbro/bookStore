@@ -8,8 +8,8 @@ const Footer = () => {
         <div className="order-1 flex flex-col items-start gap-2 pr-8">
             <img className="w-50 "  src={assets.logo} alt="logo" />
             <p className="text-lg mb-4">Check out the new latest Books.Shop Now!</p>
-            <a href="#"><i class="fa-solid fa-phone-volume mr-2"></i> +91 9816496136</a>
-            <a href="#"><i class="fa-solid fa-envelope mr-2"></i> info@gmaiil.com</a>
+            <a href="#"><i className="fa-solid fa-phone-volume mr-2"></i> +91 9816496136</a>
+            <a href="#"><i className="fa-solid fa-envelope mr-2"></i> info@gmaiil.com</a>
         </div>
 
         <div className="order-3  lg:order-2 flex flex-col items-start gap-4">

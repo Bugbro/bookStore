@@ -1,12 +1,19 @@
-import React from "react";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchBooks } from "../redux/features/bookSlice.js";
 import { assets } from "../assets/assets.js";
 import Card from "../components/Card.jsx";
 import OurFavCards from "../components/OurFavCards.jsx";
 import FiveColCard from "../components/FiveColCard.jsx";
 import ServiceBar from "../components/ServiceBar.jsx";
-import Footer from "../components/Footer.jsx";
 
 const Home = () => {
+
+  const dispatch = useDispatch();
+  useEffect(()=>{
+    dispatch(fetchBooks());
+  },[dispatch]);
+
   return (
     <div className="">
       <div
@@ -23,7 +30,7 @@ const Home = () => {
             href="/shop"
             className="bg-white text-[#0f8967] hover:bg-white/96 hover:text-[#0f8967] font-semibold duration-300 px-5 py-3 rounded-full w-fit flex items-center gap-2"
           >
-            <span>Shop Now</span> <i class="fa-solid fa-angle-right"></i>
+            <span>Shop Now</span> <i className="fa-solid fa-angle-right"></i>
           </a>
         </div>
         <div className="h-full">
@@ -37,7 +44,6 @@ const Home = () => {
       <OurFavCards/>
       <FiveColCard/>
       <ServiceBar/>
-      <Footer/>
     </div>
   );
 };
