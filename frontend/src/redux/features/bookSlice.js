@@ -17,8 +17,8 @@ export const fetchBooks = createAsyncThunk(
 export const fetchBookById = createAsyncThunk(
     "books/fetchBookById",
     async (id)=> {
-        const res = await api.get(`/books/${id}`);
-        return res.data
+        const response = await api.get(`/books/${id}`);
+        return response.data
     }
 );
 

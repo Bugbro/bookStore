@@ -1,10 +1,19 @@
 import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchBooks } from "../redux/features/bookSlice";
 
 const FiveColCard = () => {
+  const dispatch = useDispatch();
   const { books, loading } = useSelector((state) => state.books);
   const products = books.data?.slice(0, 4);
+  
+  useEffect(()=>{
+    if(!books){
+      dispatch(fetchBooks);
+    }
+  },[])
 
   if (loading) return <p>Loading...</p>;
   return (
@@ -16,7 +25,7 @@ const FiveColCard = () => {
         </Link>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mt-6 ">
-        {products.map((item, i) => (
+        {products?.map((item, i) => (
           <div
             className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-103 duration-200"
             key={i}
