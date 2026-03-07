@@ -7,6 +7,7 @@ import cartRouter from "./src/routes/cartRoutes.js";
 import bookRouter from "./src/routes/bookRoutes.js";
 import connectCloudinary from "./src/config/cloudinary.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 
 configDotenv();
@@ -16,6 +17,23 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 connectCloudinary();
 
+//cors setup for admin and frontend
+const allowedOrigins = [
+  "http://localhost:5173"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
