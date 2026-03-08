@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { Link } from "react-router-dom";
+import CartPop from "./cartPop";
 
 const Navbar = () => {
+
+  const [showCart, setShowCart] = useState(false);
+  
   return (
     <>
         {/* top line */}
@@ -37,7 +41,10 @@ const Navbar = () => {
               <a href="#" className="flex gap-2 items-center  hover:text-[#17BD8D] duration-150"><i className="fas fa-location"></i><span className="border-b font-semibold text-sm">Find a book store</span></a>
               <div><i className="fa-regular fa-user"></i></div>
               <div><i className="fa-regular fa-heart"></i></div>
-              <div><i className="fa-solid fa-bag-shopping"></i></div>
+              <div className="relative" >
+                <i onClick={()=>setShowCart(!showCart)} className="fa-solid fa-bag-shopping"></i>
+                <CartPop isOpen={showCart} />
+              </div>
             </div>
         </div>
       </div>

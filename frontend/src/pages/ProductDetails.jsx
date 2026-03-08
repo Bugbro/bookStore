@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchBookById } from "../redux/features/bookSlice.js";
+import { addToCart } from "../redux/features/cart/cartSlice.js";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -10,6 +11,17 @@ const ProductDetails = () => {
   const { books, singleBook, loading } = useSelector((state) => state.books);
   const [qty, setQty] = useState(1);
 
+  const handlerAddToCart = () =>{
+    dispatch(
+      addToCart({
+        _id: book._id,
+        title: book.title,
+        price: book.price,
+        image: book.images[0],
+        quantity: qty
+      })
+    )
+  }
   const increase = () => setQty(qty + 1);
   const decrease = () => {
     if (qty > 1) setQty(qty - 1);
@@ -85,7 +97,9 @@ const ProductDetails = () => {
                 +
               </button>
             </div>
-            <button className="flex items-center gap-2 bg-[#0f8967] text-white font-semibold px-6 py-2 rounded-full hover:bg-[#0d7255]"><i class="fa-solid fa-cart-plus"></i>  Add to cart </button>
+            <button onClick={handlerAddToCart} className="flex items-center gap-2 bg-[#0f8967] text-white font-semibold px-6 py-2 rounded-full hover:bg-[#0d7255]">
+              <i class="fa-solid fa-cart-plus" ></i>  Add to cart 
+            </button>
           </div>
           <p>Categories: <span className="text-sm font-semibold capitalize">{book?.category}</span></p>
         </div>
