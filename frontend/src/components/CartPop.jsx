@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux';
 const CartPop = ({isOpen}) => {
 
     const cartItems = useSelector((state)=> state.cart.cartItems);
+    console.log(cartItems);
+    
 
     if(!isOpen) return null;
   return (
@@ -15,21 +17,34 @@ const CartPop = ({isOpen}) => {
         <p className="text-gray-500">Cart is empty</p>
       ) : (
         cartItems.map((item) => (
-          <div key={item._id} className="flex items-center gap-3 mb-3">
+          // <div key={item._id} className="flex items-center gap-3 mb-3">
 
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-12 h-12 object-cover rounded"
-            />
+          //   <img
+          //     src={item.image}
+          //     alt={item.title}
+          //     className="w-12 h-12 object-cover rounded"
+          //   />
 
+          //   <div>
+          //     <p className="text-sm font-semibold">{item.title}</p>
+          //     <p className="text-sm text-gray-500">
+          //       {item.quantity} × ₹{item.price}
+          //     </p>
+          //   </div>
+
+          // </div>
+          <div>
+            <img src={item.image} />
             <div>
-              <p className="text-sm font-semibold">{item.title}</p>
-              <p className="text-sm text-gray-500">
-                {item.quantity} × ₹{item.price}
-              </p>
+              <h3>{item.author}</h3>
+              <p>{item.title}</p>
+              <p>{item.price}</p>
+              <div className='flex items-center '>
+                <p>-</p>
+                <p>{item.quantity}</p>
+                <p>+</p>
+              </div>
             </div>
-
           </div>
         ))
       )}

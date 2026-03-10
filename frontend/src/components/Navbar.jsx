@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { Link } from "react-router-dom";
 import CartPop from "./cartPop";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
-
   const [showCart, setShowCart] = useState(false);
-  
+  const cartItems = useSelector((state) => state.cart.cartItems);
+
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
   return (
     <>
-        {/* top line */}
+      {/* top line */}
       <div className="px-28 py-3 bg-black text-white flex justify-between items-center w-full text-sm">
         <div className="flex items-center justify-between gap-6 ">
           <p>
@@ -29,23 +32,46 @@ const Navbar = () => {
 
       {/* middle bar */}
       <div className="px-28 py-3 bg-white text-black flex justify-between items-center w-full border-b-[#17BD8D]/40 border-b">
-        <div className="w-40"><img src={assets.logo} alt="logo" /></div>
+        <div className="w-40">
+          <img src={assets.logo} alt="logo" />
+        </div>
         <div className="flex flex-1 items-center justify-end gap-6 ">
-
           {/* search fild */}
-            <div className="bg-[#efefef] pl-4  rounded-full w-1/2 flex items-center justify-between">
-              <input className="w-full outline-none font-medium px-2 py-3" type="text" placeholder="Search Products...." />
-              <span className="bg-[#17BD8D] cursor-pointer text-white py-3 px-6  mr-0 rounded-full hover:bg-[#15ae83] duration-200"> <i className="fas fa-search  "></i></span>
+          <div className="bg-[#efefef] pl-4  rounded-full w-1/2 flex items-center justify-between">
+            <input
+              className="w-full outline-none font-medium px-2 py-3"
+              type="text"
+              placeholder="Search Products...."
+            />
+            <span className="bg-[#17BD8D] cursor-pointer text-white py-3 px-6  mr-0 rounded-full hover:bg-[#15ae83] duration-200">
+              {" "}
+              <i className="fas fa-search  "></i>
+            </span>
+          </div>
+          <div className="flex gap-4 text-xl">
+            <a
+              href="#"
+              className="flex gap-2 items-center  hover:text-[#17BD8D] duration-150"
+            >
+              <i className="fas fa-location"></i>
+              <span className="border-b font-semibold text-sm">
+                Find a book store
+              </span>
+            </a>
+            <div>
+              <i className="fa-regular fa-user"></i>
             </div>
-            <div className="flex gap-4 text-xl">
-              <a href="#" className="flex gap-2 items-center  hover:text-[#17BD8D] duration-150"><i className="fas fa-location"></i><span className="border-b font-semibold text-sm">Find a book store</span></a>
-              <div><i className="fa-regular fa-user"></i></div>
-              <div><i className="fa-regular fa-heart"></i></div>
-              <div className="relative" >
-                <i onClick={()=>setShowCart(!showCart)} className="fa-solid fa-bag-shopping"></i>
-                <CartPop isOpen={showCart} />
-              </div>
+            <div>
+              <i className="fa-regular fa-heart"></i>
             </div>
+            <div className="relative" >
+              <i onClick={() => setShowCart(!showCart)} className="fa-solid fa-bag-shopping cursor-pointer"></i>
+              <span onClick={() => setShowCart(!showCart)}  className="absolute top-3 cursor-pointer -right-2 bg-[#17BD8D] text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                {cartCount}
+              </span>
+              <CartPop isOpen={showCart} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -53,7 +79,11 @@ const Navbar = () => {
       <div className="px-28 py-3 flex items-center justify-between ">
         <div className="bg-[#17BD8D] text-white px-4 py-1 rounded-full">
           <i className="fa-solid fa-list-ul"></i>
-          <select name="category" id="" className="pl-2 pr-20 py-2 hover:white font-semibold bg-[#17BD8D] outline-none">
+          <select
+            name="category"
+            id=""
+            className="pl-2 pr-20 py-2 hover:white font-semibold bg-[#17BD8D] outline-none"
+          >
             <option value="Category">Category</option>
             <option value="History">History </option>
             <option value="Fiction">Fiction</option>
@@ -72,13 +102,16 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4 ">
-          <div className="text-[#17BD8D] bg-[#efefef] flex items-center p-3 rounded-full"><i className="fa-solid fa-phone-volume "></i></div> 
+          <div className="text-[#17BD8D] bg-[#efefef] flex items-center p-3 rounded-full">
+            <i className="fa-solid fa-phone-volume "></i>
+          </div>
           <div>
-            <p className="text-[#17BD8D] text-sm font-semibold">+91 9816496136</p>
+            <p className="text-[#17BD8D] text-sm font-semibold">
+              +91 9816496136
+            </p>
             <p className="text-xs">24/7 Support Center</p>
           </div>
         </div>
-
       </div>
     </>
   );

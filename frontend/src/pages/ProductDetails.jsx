@@ -20,7 +20,8 @@ const ProductDetails = () => {
         image: book.images[0],
         quantity: qty
       })
-    )
+    );
+    setQty(1);
   }
   const increase = () => setQty(qty + 1);
   const decrease = () => {
@@ -98,7 +99,7 @@ const ProductDetails = () => {
               </button>
             </div>
             <button onClick={handlerAddToCart} className="flex items-center gap-2 bg-[#0f8967] text-white font-semibold px-6 py-2 rounded-full hover:bg-[#0d7255]">
-              <i class="fa-solid fa-cart-plus" ></i>  Add to cart 
+              <i className="fa-solid fa-cart-plus" ></i>  Add to cart 
             </button>
           </div>
           <p>Categories: <span className="text-sm font-semibold capitalize">{book?.category}</span></p>

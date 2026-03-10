@@ -53,8 +53,8 @@ const FiveColCard = () => {
         <div className=" col-span-2 lg:col-span-2 flex flex-col gap-2 p-4">
           <img
             className="rounded-lg w-full h-102"
-            src={products[0].images[0]}
-            alt={products[0].title}
+            src={products?.[0]?.images?.[0] || assets.dummyImg}
+            
           />
         </div>
       </div>
