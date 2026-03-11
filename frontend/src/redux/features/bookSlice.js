@@ -22,10 +22,19 @@ export const fetchBookById = createAsyncThunk(
     }
 );
 
+export const fetchRelatedBooks = createAsyncThunk(
+    "books/fetchRelatedBooks",
+    async(category) =>{
+        const response = await api.get(`/books/category/${category}`);
+        return response.data;
+    }
+)
+
 const bookSlice = createSlice({
     name: "books",
     initialState:{
         books: [],
+        relatedBooks: [],
         singleBook:null,
         loading: "idle",
         error: null,
@@ -57,6 +66,17 @@ const bookSlice = createSlice({
             state.loading = false;
             state.error = action.payload;
         })
+        .addCase(fetchRelatedBooks.pending, (state)=>{
+            state.loading = true;
+        })
+        .addCase(fetchRelatedBooks.fulfilled, (state, action)=>{
+            state.loading = false;
+            state.relatedBooks = action.payload;
+        })
+        .addCase(fetchRelatedBooks.rejected, (state)=>{
+            state.loading = false;
+            state.error = action.payload;
+        });
     }
 });
 

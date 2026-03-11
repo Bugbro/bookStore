@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchBookById } from "../redux/features/bookSlice.js";
 import { addToCart } from "../redux/features/cart/cartSlice.js";
+import RelatedProducts from "../components/relatedProducts.jsx";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -105,6 +106,8 @@ const ProductDetails = () => {
           <p>Categories: <span className="text-sm font-semibold capitalize">{book?.category}</span></p>
         </div>
       </div>
+
+      <RelatedProducts bookCategory={book.category} />
     </div>
   );
 };
