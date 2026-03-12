@@ -22,7 +22,7 @@ const CartPop = ({ isOpen }) => {
         <div>
           <div className="h-102 overflow-y-auto hide-scrollbar">
             {cartItems.map((item) => (
-              <div className="flex items-start gap-2 border-b border-gray-200 py-3">
+              <div className="flex items-start gap-2 border-b border-gray-200 py-3" key={item.item._id}>
                 <img src={item.image} className=" w-12" />
                 <div className="flex flex-col gap-1">
                   <p className="text-base font-semibold">{item.title}</p>

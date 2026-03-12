@@ -37,6 +37,7 @@ const bookSlice = createSlice({
         relatedBooks: [],
         singleBook:null,
         loading: "idle",
+        relatedBookLoading: false,
         error: null,
     },
     reducers: {},
@@ -67,14 +68,14 @@ const bookSlice = createSlice({
             state.error = action.payload;
         })
         .addCase(fetchRelatedBooks.pending, (state)=>{
-            state.loading = true;
+            state.relatedBookLoading = true;
         })
         .addCase(fetchRelatedBooks.fulfilled, (state, action)=>{
-            state.loading = false;
+            state.relatedBookLoading = false;
             state.relatedBooks = action.payload;
         })
         .addCase(fetchRelatedBooks.rejected, (state)=>{
-            state.loading = false;
+            state.relatedBookLoading = false;
             state.error = action.payload;
         });
     }

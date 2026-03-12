@@ -8,7 +8,13 @@ const Products = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { books, loading } = useSelector((state) => state.books);
-  console.log(books.data)
+  console.log(books.data);
+
+  useEffect(()=>{
+    if(books.data == undefined){
+      dispatch(fetchBooks());
+    }
+  },[])
 
   useEffect(() => {
     if (loading === "idle") {

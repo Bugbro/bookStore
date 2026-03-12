@@ -11,6 +11,7 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
   const { books, singleBook, loading } = useSelector((state) => state.books);
   const [qty, setQty] = useState(1);
+  const [mainImage, setMainImage] = useState("");
 
   const handlerAddToCart = () =>{
     dispatch(
@@ -30,7 +31,12 @@ const ProductDetails = () => {
   };
 
   const book = books.data?.find((b) => b._id === id) || singleBook;
-  console.log(book);
+  console.log("product details");
+  useEffect(() => {
+  if (book?.images?.length > 0) {
+    setMainImage(book.images[0]);
+  }
+}, [book]);
 
   useEffect(() => {
     if (!book) {
@@ -38,7 +44,6 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  const [mainImage, setMainImage] = useState(book?.images[0]);
   if (loading) return <h3>Loading please wait</h3>;
   return (
     <div className="px-28 py-3 my-10">
@@ -107,7 +112,7 @@ const ProductDetails = () => {
         </div>
       </div>
 
-      <RelatedProducts bookCategory={book.category} />
+      <RelatedProducts bookCategory={book.category} bookId={book._id} />
     </div>
   );
 };
