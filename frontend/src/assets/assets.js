@@ -5,6 +5,7 @@ import cardAlchemist from "./cardAlchemist.png";
 import cardIkigia from "./cardIkigia.png";
 import theSecret from "./theSecret.jpg";
 import dummyImg from "./dummyImg.jpg";
+import contact from "./contactUs.png"
 
 
 export const assets = {
@@ -14,5 +15,6 @@ export const assets = {
     cardAlchemist,
     cardIkigia,
     theSecret,
-    dummyImg  
+    dummyImg,
+    contact  
 }
