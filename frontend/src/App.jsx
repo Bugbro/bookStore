@@ -7,6 +7,7 @@ import Footer from './components/Footer.jsx';
 import ProductDetails from './pages/ProductDetails.jsx';
 import Contact from './pages/Contact.jsx';
 import Blog from './pages/Blog.jsx';
+import About from './pages/About.jsx';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Route path='/products/:id' element={<ProductDetails/>} />
         <Route path='/blog' element={<Blog/>} />
         <Route path='/contact' element={<Contact/>} />
+        <Route path='/about' element={<About/>} />
       </Routes>
       <Footer/>
     </>
