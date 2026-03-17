@@ -105,3 +105,21 @@
   background: #20d38c;
   
 }
+
+.aboutUsContainer{
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  justify-items: start;
+  justify-content: center;
+  text-align: justify;
+}
+
+.aboutUsContainer h3{
+  font-weight: 600;
+  font-size: 16px;
+}
+.aboutUsContainer p{
+  font-size: 14px;
+  color: rgb(133, 133, 133);
+}

@@ -6,7 +6,8 @@ import cardIkigia from "./cardIkigia.png";
 import theSecret from "./theSecret.jpg";
 import dummyImg from "./dummyImg.jpg";
 import contact from "./contactUs.png";
-import aboutUs from "./aboutUs.jpg"
+import aboutUs from "./aboutUs.jpg";
+import geogreMatin from "./geogre-martin.png"
 
 
 export const assets = {
@@ -18,5 +19,6 @@ export const assets = {
     theSecret,
     dummyImg,
     contact,
-    aboutUs  
+    aboutUs,
+    geogreMatin  
 }
