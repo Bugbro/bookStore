@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { increaseQty, decreaseQty } from "../redux/features/cart/cartSlice";
 
-const CartPop = ({ isOpen }) => {
+const CartPop = ({ isOpen, onCheckoutClick }) => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cartItems);
   const subTotal = cartItems.reduce(
@@ -22,7 +22,7 @@ const CartPop = ({ isOpen }) => {
         <div>
           <div className="h-102 overflow-y-auto hide-scrollbar">
             {cartItems.map((item) => (
-              <div className="flex items-start gap-2 border-b border-gray-200 py-3" key={item.item._id}>
+              <div className="flex items-start gap-2 border-b border-gray-200 py-3" key={item._id}>
                 <img src={item.image} className=" w-12" />
                 <div className="flex flex-col gap-1">
                   <p className="text-base font-semibold">{item.title}</p>
@@ -55,6 +55,12 @@ const CartPop = ({ isOpen }) => {
             <span>Subtotal</span>
             <span>₹{subTotal}</span>
           </div>
+          <button
+            onClick={onCheckoutClick}
+            className="w-full bg-[#17BD8D] text-white py-3 mt-4 rounded-xl font-bold hover:bg-[#15ae83] transition-colors duration-200"
+          >
+            Checkout
+          </button>
         </div>
       )}
     </div>

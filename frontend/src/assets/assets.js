@@ -8,7 +8,7 @@ import dummyImg from "./dummyImg.jpg";
 import contact from "./contactUs.png";
 import aboutUs from "./aboutUs.jpg";
 import geogreMatin from "./geogre-martin.png"
-
+import loginBg from "./loginBookStore.svg"
 
 export const assets = {
     logo,
@@ -20,5 +20,6 @@ export const assets = {
     dummyImg,
     contact,
     aboutUs,
-    geogreMatin  
+    geogreMatin,
+    loginBg
 }
