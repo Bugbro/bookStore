@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { increaseQty, decreaseQty } from "../redux/features/cart/cartSlice";
+import { placeOrder } from "../redux/features/order/order.js";
 
 const CheckoutModal = ({ isOpen, onClose }) => {
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -9,6 +10,8 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  const { loading } = useSelector((state) => state.order);
 
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("COD");
@@ -31,17 +34,23 @@ const CheckoutModal = ({ isOpen, onClose }) => {
     setStep(2);
   };
 
-  const handlePlaceOrder = () => {
-    // Integrate API call here in the future
-    console.log("Order placed:", {
-      items: cartItems,
-      deliveryAddress: formData,
-      paymentMethod,
-      totalAmount: subTotal,
-    });
-    // Simulating order logic completion:
-    alert("Order placed successfully via " + paymentMethod + "!");
-    onClose();
+  const handlePlaceOrder = async () => {
+    try {
+      const orderData = {
+        deliveryAddress: formData,
+        paymentMethod,
+      };
+      const resultAction = await dispatch(placeOrder(orderData));
+      if (placeOrder.fulfilled.match(resultAction)) {
+        alert(resultAction.payload?.message || "Order placed successfully!");
+        onClose();
+      } else {
+        alert(resultAction.payload?.message || resultAction.payload || "Failed to place order.");
+      }
+    } catch (err) {
+      console.error("Order error:", err);
+      alert("Failed to place order. Please try again.");
+    }
   };
 
   if (!isOpen) return null;
@@ -65,7 +74,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                 <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">
                   Order Summary
                 </h2>
-                
+
                 {cartItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">
                     <i className="fa-solid fa-cart-shopping text-4xl mb-3 text-gray-300"></i>
@@ -106,7 +115,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                   </div>
                 )}
               </div>
-              
+
               {/* Subtotal Section */}
               <div className="p-6 md:p-8 bg-gray-100 border-t border-gray-200">
                 <div className="flex justify-between items-center text-lg font-bold text-gray-800">
@@ -122,7 +131,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                 <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">
                   Shipping Details
                 </h2>
-                
+
                 <form className="flex flex-col gap-5 flex-1" onSubmit={handleContinueToPayment}>
                   <div className="flex flex-col gap-1">
                     <label className="text-sm font-semibold text-gray-600">Full Name</label>
@@ -265,17 +274,17 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                 <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-4">
                   Payment Method
                 </h2>
-                
+
                 <form className="flex flex-col gap-5 flex-1" onSubmit={(e) => { e.preventDefault(); handlePlaceOrder(); }}>
                   <div className="flex flex-col gap-4">
                     {/* COD Option */}
-                    <label 
+                    <label
                       className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${paymentMethod === 'COD' ? 'border-[#17BD8D] bg-[#17BD8D]/5' : 'border-gray-200 hover:border-[#17BD8D]/50'}`}
                     >
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="COD" 
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="COD"
                         checked={paymentMethod === 'COD'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
                         className="w-5 h-5 text-[#17BD8D] focus:ring-[#17BD8D] mr-4"
@@ -287,13 +296,13 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                     </label>
 
                     {/* Online Option */}
-                    <label 
+                    <label
                       className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${paymentMethod === 'Online' ? 'border-[#17BD8D] bg-[#17BD8D]/5' : 'border-gray-200 hover:border-[#17BD8D]/50'}`}
                     >
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="Online" 
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Online"
                         checked={paymentMethod === 'Online'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
                         className="w-5 h-5 text-[#17BD8D] focus:ring-[#17BD8D] mr-4"
@@ -315,9 +324,10 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 bg-[#17BD8D] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#15ae83] transform hover:-translate-y-1 transition-all duration-200 shadow-lg shadow-[#17BD8D]/30"
+                      disabled={loading}
+                      className="flex-1 bg-[#17BD8D] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#15ae83] transform hover:-translate-y-1 transition-all duration-200 shadow-lg shadow-[#17BD8D]/30 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Place Order
+                      {loading ? "Placing Order..." : "Place Order"}
                     </button>
                   </div>
                 </form>

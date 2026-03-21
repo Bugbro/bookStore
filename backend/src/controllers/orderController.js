@@ -1,16 +1,19 @@
-import Cart from "../models/Cart";
+import Cart from "../models/Cart.js";
 import Order from "../models/Order.js";
 import { resHandler } from "../utils/resHandler.js";
 
 export const placeOrder = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { deliveryAddress } = req.body;
-        if(!deliveryAddress || !deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.state || !deliveryAddress.pincode || !deliveryAddress.phone){
+        const { deliveryAddress, paymentMethod } = req.body;
+        if (!deliveryAddress || !deliveryAddress.name || !deliveryAddress.email || !deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.state || !deliveryAddress.pincode || !deliveryAddress.phone) {
             return resHandler(res, 400, "All delivery address fields are required");
         }
-        const cart = await Cart.findOne({ userId}).populate("items.bookId");
-        if(!cart || cart.items.length === 0){
+        if (!paymentMethod) {
+            return resHandler(res, 400, "Payment method is required");
+        }
+        const cart = await Cart.findOne({ userId }).populate("items.bookId");
+        if (!cart || cart.items.length === 0) {
             return resHandler(res, 400, "Cart is empty");
         }
 
@@ -19,6 +22,7 @@ export const placeOrder = async (req, res) => {
             items: cart.items,
             totalAmount: cart.totalPrice,
             deliveryAddress,
+            paymentMethod,
             status: "Pending",
         });
 
@@ -36,7 +40,7 @@ export const getUserOrders = async (req, res) => {
     try {
         const userId = req.user.id;
         const orders = await Order.find({ userId }).populate("items.bookId");
-        if(!orders || orders.length === 0){
+        if (!orders || orders.length === 0) {
             return resHandler(res, 404, "No orders found for this user");
         }
         return resHandler(res, 200, "User orders retrieved successfully", orders);
@@ -50,7 +54,7 @@ export const getOrderById = async (req, res) => {
     try {
         const id = req.params;
         const order = await Order.findById(id).populate("items.bookId").populate("userId", "name email");
-        if(!order){
+        if (!order) {
             return resHandler(res, 404, "Order not found");
         }
         return resHandler(res, 200, "Order retrieved successfully", order);
@@ -61,20 +65,20 @@ export const getOrderById = async (req, res) => {
 }
 
 // admin
-export const updateOrderStatus = async(req,res)=>{
+export const updateOrderStatus = async (req, res) => {
     try {
-        const {id} = req.params;
-        const {status} = req.body;
+        const { id } = req.params;
+        const { status } = req.body;
         const allowedStatus = ["pending", "processing", "shipped", "delivered"];
-        if(!allowedStatus.includes(status)){
+        if (!allowedStatus.includes(status)) {
             return resHandler(res, 400, "Invalid status value");
         }
         const order = await Order.findByIdAndUpdate(
             id,
-            {status},
-            {new: true}
+            { status },
+            { new: true }
         );
-        if(!order){
+        if (!order) {
             return resHandler(res, 404, "Order not found");
         }
         return resHandler(res, 200, "Order status updated successfully", order);

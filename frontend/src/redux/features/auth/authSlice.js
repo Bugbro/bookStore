@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../api/axios.js';
+import api from '../../../api/axios.js';
 
 // Check if user is authenticated via cookie
 export const checkAuth = createAsyncThunk(

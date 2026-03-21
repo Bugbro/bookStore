@@ -3,7 +3,7 @@ import { assets } from '../assets/assets';
 import api from '../api/axios';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from '../redux/features/authSlice';
+import { setCredentials } from '../redux/features/auth/authSlice';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);

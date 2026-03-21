@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { checkAuth } from './redux/features/authSlice';
+import { checkAuth } from './redux/features/auth/authSlice';
 import Navbar from './components/Navbar'
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home.jsx';

@@ -5,7 +5,7 @@ import CartPop from "./CartPop";
 import CheckoutModal from "./CheckoutModal";
 import LoginModal from "./LoginModal";
 import { useSelector, useDispatch } from "react-redux";
-import { logoutUser } from "../redux/features/authSlice";
+import { logoutUser } from "../redux/features/auth/authSlice";
 import { toast } from 'react-toastify';
 
 const Navbar = () => {
@@ -140,7 +140,11 @@ const Navbar = () => {
                 isOpen={showCart}
                 onCheckoutClick={() => {
                   setShowCart(false);
-                  setIsCheckoutOpen(true);
+                  if (user) {
+                    setIsCheckoutOpen(true);
+                  } else {
+                    setIsLoginModalOpen(true);
+                  }
                 }}
               />
             </div>

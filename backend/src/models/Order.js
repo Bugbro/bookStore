@@ -23,11 +23,18 @@ const orderSchema = new mongoose.Schema({
         enum:["pending", "processing", "shipped", "delivered"],
         default:"pending",
     },
+    paymentMethod:{
+        type: String,
+        enum: ["COD", "Online"],
+        default: "COD",
+    },
     paymentId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Payment",
     },
     deliveryAddress:{
+        name: String,
+        email: String,
         street: String,
         city: String,
         state: String,
