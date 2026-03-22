@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { checkAuth } from './redux/features/auth/authSlice';
+import { fetchUserCart } from './redux/features/cart/cartSlice.js';
 import Navbar from './components/Navbar'
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home.jsx';
@@ -15,10 +16,17 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchUserCart());
+    }
+  }, [user, dispatch]);
 
   return (
     <>

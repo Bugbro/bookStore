@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { increaseQty, decreaseQty } from "../redux/features/cart/cartSlice";
+import { increaseQtyThunk, decreaseQtyThunk, removeFromCartThunk } from "../redux/features/cart/cartSlice";
 
 const CartPop = ({ isOpen, onCheckoutClick }) => {
   const dispatch = useDispatch();
@@ -24,21 +24,26 @@ const CartPop = ({ isOpen, onCheckoutClick }) => {
             {cartItems.map((item) => (
               <div className="flex items-start gap-2 border-b border-gray-200 py-3" key={item._id}>
                 <img src={item.image} className=" w-12" />
-                <div className="flex flex-col gap-1">
-                  <p className="text-base font-semibold">{item.title}</p>
+                <div className="flex flex-col gap-1 w-full">
+                  <div className="flex justify-between items-start">
+                    <p className="text-base font-semibold pr-4">{item.title}</p>
+                    <button onClick={() => dispatch(removeFromCartThunk(item._id))} className="text-red-400 hover:text-red-600 transition-colors" title="Remove Item">
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
                   <p className="text-[#17BD8D] font-medium text-base">
                     Rs. {item.price}
                   </p>
                   <div className="flex items-center gap-2">
                     <p
-                      onClick={() => dispatch(decreaseQty(item._id))}
+                      onClick={() => dispatch(decreaseQtyThunk(item._id))}
                       className="border bg-gray-200 border-gray-200 px-2 py-0 text-2xl  cursor-pointer"
                     >
                       -
                     </p>
                     <p className="px-2">{item.quantity}</p>
                     <p
-                      onClick={() => dispatch(increaseQty(item._id))}
+                      onClick={() => dispatch(increaseQtyThunk(item._id))}
                       className="border bg-gray-200 border-gray-200 px-2 py-0 text-2xl  cursor-pointer"
                     >
                       +

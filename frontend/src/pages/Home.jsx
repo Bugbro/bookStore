@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { fetchBooks } from "../redux/features/bookSlice.js";
+import { fetchBooks } from "../redux/features/book/bookSlice.js";
 import { assets } from "../assets/assets.js";
 import Card from "../components/Card.jsx";
 import OurFavCards from "../components/OurFavCards.jsx";

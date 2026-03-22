@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../api/axios.js";
+import api from "../../../api/axios.js";
 
 //async function to fetch books from the backend
 export const fetchBooks = createAsyncThunk(
     "books/fetchBooks",
-    async(_,thunkAPI) => {
+    async(searchQuery, thunkAPI) => {
         try {
-            const response = await api.get("/books");
+            const url = searchQuery ? `/books?search=${searchQuery}` : "/books";
+            const response = await api.get(url);
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data || "Failed to fetch books");

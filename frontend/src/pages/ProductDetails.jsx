@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { fetchBookById } from "../redux/features/bookSlice.js";
-import { addToCart } from "../redux/features/cart/cartSlice.js";
+import { fetchBookById } from "../redux/features/book/bookSlice.js";
+import { addToCartThunk } from "../redux/features/cart/cartSlice.js";
 import RelatedProducts from "../components/relatedProducts.jsx";
 
 const ProductDetails = () => {
@@ -15,7 +15,7 @@ const ProductDetails = () => {
 
   const handlerAddToCart = () =>{
     dispatch(
-      addToCart({
+      addToCartThunk({
         _id: book._id,
         title: book.title,
         price: book.price,

@@ -23,7 +23,7 @@ export const placeOrder = async (req, res) => {
             totalAmount: cart.totalPrice,
             deliveryAddress,
             paymentMethod,
-            status: "Pending",
+            status: "pending",
         });
 
         cart.items = [];

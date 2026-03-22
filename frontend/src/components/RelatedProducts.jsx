@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchRelatedBooks } from "../redux/features/bookSlice.js";
+import { fetchRelatedBooks } from "../redux/features/book/bookSlice.js";
 import { useNavigate } from "react-router-dom";
 
 const RelatedProducts = ({ bookCategory, bookId }) => {

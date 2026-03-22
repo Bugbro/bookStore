@@ -1,26 +1,21 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBooks } from "../redux/features/bookSlice";
-import { useNavigate } from "react-router-dom";
+import { fetchBooks } from "../redux/features/book/bookSlice";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Products = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { books, loading } = useSelector((state) => state.books);
-  console.log(books.data);
-
-  useEffect(()=>{
-    if(books.data == undefined){
-      dispatch(fetchBooks());
-    }
-  },[])
+  
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get("search") || "";
 
   useEffect(() => {
-    if (loading === "idle") {
-      dispatch(fetchBooks());
-    }
-  }, [dispatch, loading]);
+    dispatch(fetchBooks(searchQuery));
+  }, [dispatch, searchQuery]);
 
   const products = books?.data || [];
 

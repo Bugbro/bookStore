@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { increaseQty, decreaseQty } from "../redux/features/cart/cartSlice";
-import { placeOrder } from "../redux/features/order/order.js";
+import { increaseQtyThunk, decreaseQtyThunk, removeFromCartThunk, clearCart } from "../redux/features/cart/cartSlice";
+import { placeOrder } from "../redux/features/order/orderSlice.js";
 
 const CheckoutModal = ({ isOpen, onClose }) => {
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -43,6 +43,7 @@ const CheckoutModal = ({ isOpen, onClose }) => {
       const resultAction = await dispatch(placeOrder(orderData));
       if (placeOrder.fulfilled.match(resultAction)) {
         alert(resultAction.payload?.message || "Order placed successfully!");
+        dispatch(clearCart());
         onClose();
       } else {
         alert(resultAction.payload?.message || resultAction.payload || "Failed to place order.");
@@ -89,18 +90,23 @@ const CheckoutModal = ({ isOpen, onClose }) => {
                           alt={item.title}
                           className="w-16 h-20 object-cover rounded-md"
                         />
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 line-clamp-1">{item.title}</h3>
+                        <div className="flex-1 w-full">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-semibold text-gray-800 line-clamp-1 pr-2">{item.title}</h3>
+                            <button onClick={() => dispatch(removeFromCartThunk(item._id))} className="text-gray-400 hover:text-red-500 transition-colors" title="Remove Item">
+                               <i className="fa-solid fa-trash"></i>
+                            </button>
+                          </div>
                           <div className="flex items-center gap-3 mt-1 mb-1">
                             <button
-                              onClick={() => dispatch(decreaseQty(item._id))}
+                              onClick={() => dispatch(decreaseQtyThunk(item._id))}
                               className="w-6 h-6 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-md text-gray-600 font-bold transition-colors"
                             >
                               -
                             </button>
                             <span className="text-sm font-semibold">{item.quantity}</span>
                             <button
-                              onClick={() => dispatch(increaseQty(item._id))}
+                              onClick={() => dispatch(increaseQtyThunk(item._id))}
                               className="w-6 h-6 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-md text-gray-600 font-bold transition-colors"
                             >
                               +

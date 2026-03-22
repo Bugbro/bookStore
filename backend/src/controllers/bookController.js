@@ -86,8 +86,17 @@ export const updateBook = async(req, res)=>{
 //for all
 export const getBooks = async(req, res)=>{
     try {
-        const books = await Book.find().sort({createdAt: -1});
-        if(!books || books.length === 0) return resHandler(res, 404, "Books not found.");
+        const { search } = req.query || {};
+        let query = {};
+        if (search) {
+             query = {
+                  $or: [
+                       { title: { $regex: search, $options: "i" } },
+                       { author: { $regex: search, $options: "i" } }
+                  ]
+             };
+        }
+        const books = await Book.find(query).sort({createdAt: -1});
         return resHandler(res, 200, "Books get successfully", books);
     } catch (error) {
         console.log("Error while getting  book", error.message);

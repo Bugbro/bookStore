@@ -1,26 +1,35 @@
 import React, { useState, useEffect, useRef } from "react";
 import { assets } from "../assets/assets";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CartPop from "./CartPop";
 import CheckoutModal from "./CheckoutModal";
 import LoginModal from "./LoginModal";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../redux/features/auth/authSlice";
+import { fetchBooks } from "../redux/features/book/bookSlice";
 import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const [showCart, setShowCart] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const cartItems = useSelector((state) => state.cart.cartItems);
   const { user } = useSelector((state) => state.auth);
+  const { books } = useSelector((state) => state.books);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const cartRef = useRef(null);
+  const searchRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (cartRef.current && !cartRef.current.contains(event.target)) {
         setShowCart(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsSearchFocused(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -28,6 +37,12 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (!books?.data) {
+      dispatch(fetchBooks(""));
+    }
+  }, [dispatch, books?.data]);
 
   const handleLogout = async () => {
     try {
@@ -67,16 +82,50 @@ const Navbar = () => {
         </div>
         <div className="flex flex-1 items-center justify-end gap-6 ">
           {/* search fild */}
-          <div className="bg-[#efefef] pl-4  rounded-full w-1/2 flex items-center justify-between">
-            <input
-              className="w-full outline-none font-medium px-2 py-3"
-              type="text"
-              placeholder="Search Products...."
-            />
-            <span className="bg-[#17BD8D] cursor-pointer text-white py-3 px-6  mr-0 rounded-full hover:bg-[#15ae83] duration-200">
-              {" "}
-              <i className="fas fa-search  "></i>
-            </span>
+          <div className="w-1/2 relative group z-50" ref={searchRef}>
+            <div className="bg-gray-100 pl-5 pr-1.5 py-1.5 rounded-full w-full flex items-center justify-between border border-transparent focus-within:border-[#17BD8D]/30 focus-within:bg-white focus-within:shadow-sm transition-all duration-300">
+              <input
+                className="w-full outline-none font-medium px-2 py-2 bg-transparent text-gray-700 placeholder-gray-400"
+                type="text"
+                placeholder="Search Products..."
+                value={searchTerm}
+                onFocus={() => setIsSearchFocused(true)}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setIsSearchFocused(false);
+                    navigate(searchTerm ? `/products?search=${searchTerm}` : "/products");
+                  }
+                }}
+              />
+              <button 
+                onClick={() => { setIsSearchFocused(false); navigate(searchTerm ? `/products?search=${searchTerm}` : "/products"); }} 
+                className="bg-[#17BD8D] text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#15ae83] hover:shadow-md transition-all duration-200 shrink-0 group-hover:scale-105"
+              >
+                <i className="fas fa-search text-sm"></i>
+              </button>
+            </div>
+            
+            {/* Search Dropdown */}
+            {isSearchFocused && searchTerm && books?.data && (
+              <div className="absolute top-[110%] left-0 w-full bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 overflow-hidden max-h-80 overflow-y-auto">
+                {books.data.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).length > 0 ? (
+                    books.data.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(book => (
+                      <div key={book._id} onClick={() => { setIsSearchFocused(false); navigate(`/products/${book._id}`); }} className="flex items-center gap-3 p-3 hover:bg-green-50/50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors duration-150">
+                        <img src={book.images[0]} alt={book.title} className="w-10 h-14 object-cover rounded-md shadow-sm border border-gray-100" />
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-sm text-gray-800 line-clamp-1">{book.title}</span>
+                          <span className="text-xs text-gray-500 mt-0.5">{book.author}</span>
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                    <div className="p-4 text-center text-sm text-gray-500 bg-gray-50/50">
+                        No books found for "{searchTerm}"
+                    </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex gap-4 text-xl">
             <a

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { assets } from '../assets/assets';
-import api from '../api/axios';
+import { loginAPI, registerAPI } from '../api/authAPI/authAPI.js';
+import { syncCartAPI } from '../api/cartAPI/cartAPI.js';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials } from '../redux/features/auth/authSlice';
+import { clearCart, fetchUserCart } from '../redux/features/cart/cartSlice';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +17,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     password: ''
   });
   const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.cartItems);
 
   if (!isOpen) return null;
 
@@ -27,16 +30,25 @@ const LoginModal = ({ isOpen, onClose }) => {
     try {
       if (isLogin) {
         // Login Flow
-        const res = await api.post('/auth/login', {
+        const res = await loginAPI({
           email: formData.email,
           password: formData.password
         });
         toast.success(res.data.message || 'Login successful!');
         dispatch(setCredentials(res.data.user));
+        if (cartItems.length > 0) {
+          try {
+            await syncCartAPI(cartItems);
+            dispatch(clearCart());
+          } catch (err) {
+            console.error("Cart sync failed:", err);
+          }
+        }
+        await dispatch(fetchUserCart());
         onClose(); // Close modal on success
       } else {
         // Register Flow
-        const res = await api.post('/auth/register', {
+        const res = await registerAPI({
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
@@ -44,6 +56,15 @@ const LoginModal = ({ isOpen, onClose }) => {
         });
         toast.success(res.data.message || 'Registration successful!');
         dispatch(setCredentials(res.data.user));
+        if (cartItems.length > 0) {
+          try {
+            await syncCartAPI(cartItems);
+            dispatch(clearCart());
+          } catch (err) {
+            console.error("Cart sync failed:", err);
+          }
+        }
+        await dispatch(fetchUserCart());
         onClose(); // Close modal on success
       }
     } catch (error) {
@@ -55,7 +76,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[100] flex justify-center items-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
       <div className="relative flex w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 z-[110] w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 hover:text-gray-800 transition-colors shadow-sm"
         >

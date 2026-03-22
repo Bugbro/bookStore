@@ -2,17 +2,17 @@ import Book from "../models/Book.js";
 import Cart from "../models/Cart.js";
 import { resHandler } from "../utils/resHandler.js";
 
-export const addToCart = async(req, res)=>{
+export const addToCart = async (req, res) => {
     try {
-        const {bookId, quantity} = req.body || {};
-        if(!bookId || !quantity) return resHandler(res, 400, "Please provide all fields.");
+        const { bookId, quantity } = req.body || {};
+        if (!bookId || !quantity) return resHandler(res, 400, "Please provide all fields.");
         const userId = req.user.id; //get from auth middleware
         const book = await Book.findById(bookId);
-        if(!book) return resHandler(res, 404, "Book not found.");
-        let cart = await Cart.findOne({user: userId});
-        if(!cart){
+        if (!book) return resHandler(res, 404, "Book not found.");
+        let cart = await Cart.findOne({ userId });
+        if (!cart) {
             cart = new Cart({
-                user: userId,
+                userId,
                 items: [{
                     bookId,
                     quantity,
@@ -20,18 +20,18 @@ export const addToCart = async(req, res)=>{
                 }],
                 totalPrice: book.price * quantity,
             });
-        } else{
-            const itemIndex = cart.items.findIndex(item=> item.bookId.toString() === bookId);
-            if(itemIndex > -1 ){
+        } else {
+            const itemIndex = cart.items.findIndex(item => item.bookId.toString() === bookId);
+            if (itemIndex > -1) {
                 cart.items[itemIndex].quantity += quantity;
-            }else{
+            } else {
                 cart.items.push({
                     bookId,
                     quantity,
                     price: book.price,
                 });
             }
-            cart.totalPrice = cart.items.reduce((acc, item)=> acc + item.price * item.quantity, 0);
+            cart.totalPrice = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
             await cart.save();
             return resHandler(res, 200, "Book added to cart successfully", cart);
         }
@@ -42,22 +42,75 @@ export const addToCart = async(req, res)=>{
     }
 };
 
-//update cart item
-export const updateCart = async(req, res)=>{
+//sync user local storage cart 
+export const syncCart = async (req, res) => {
     try {
-        const {bookId, quantity} = req.body || {};
-        if(!bookId || !quantity) return resHandler(res, 400, "Please provide all fields.");
         const userId = req.user.id;
-        const cart = await Cart.findOne({userId});
-        if(!cart) return resHandler(res, 404, "Cart not found.");
-        const itemIndex = cart.items.findIndex(item=> item.bookId.toString() === bookId);
-        if(itemIndex === -1) return resHandler(res, 404, "Book not found in cart.");
-        if(quantity <= 0){
+        const { cartItems } = req.body;
+        if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+            return resHandler(res, 400, "Cart is empty");
+        }
+        const bookIds = cartItems.map(item => item.bookId);
+        const books = await Book.find({ _id: { $in: bookIds } });
+
+        const bookMap = {};
+        books.forEach(book => {
+            bookMap[book._id.toString()] = book;
+        });
+
+        // find the existing cart of user in db
+        let cart = await Cart.findOne({ userId });
+        if (!cart) {
+            cart = new Cart({
+                userId,
+                items: [],
+                totalPrice: 0
+            });
+        }
+        for (let incomingItem of cartItems) {
+            const book = bookMap[incomingItem.bookId];
+            if (!book) continue; //means the book id is invalid 
+            const itemIndex = cart.items.findIndex(
+                item => item.bookId.toString() === incomingItem.bookId
+            );
+            if (itemIndex > -1) {
+                //means that the item found 
+                cart.items[itemIndex].quantity += incomingItem.quantity;
+            } else {
+                //means that the item not found
+                cart.items.push({
+                    bookId: incomingItem.bookId,
+                    quantity: incomingItem.quantity,
+                    price: book.price,
+                });
+            }
+        }
+        //again calculate the total price
+        cart.totalPrice = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        await cart.save();
+        return resHandler(res, 200, "Cart synced successfully", cart);
+    } catch (error) {
+        console.log("Error while syncing cart", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
+
+//update cart item
+export const updateCart = async (req, res) => {
+    try {
+        const { bookId, quantity } = req.body || {};
+        if (!bookId || quantity === undefined || quantity === null) return resHandler(res, 400, "Please provide all fields.");
+        const userId = req.user.id;
+        const cart = await Cart.findOne({ userId });
+        if (!cart) return resHandler(res, 404, "Cart not found.");
+        const itemIndex = cart.items.findIndex(item => item.bookId.toString() === bookId);
+        if (itemIndex === -1) return resHandler(res, 404, "Book not found in cart.");
+        if (quantity <= 0) {
             cart.items.splice(itemIndex, 1);
-        }else{
+        } else {
             cart.items[itemIndex].quantity = quantity;
         }
-        cart.totalPrice = cart.items.reduce((acc, item)=> acc + item.price * item.quantity, 0);
+        cart.totalPrice = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
         await cart.save();
         return resHandler(res, 200, "Cart updated successfully", cart);
     } catch (error) {
@@ -66,11 +119,11 @@ export const updateCart = async(req, res)=>{
     }
 };
 
-export const getCart = async(req, res)=>{
+export const getCart = async (req, res) => {
     try {
         const userId = req.user.id;
-        const cart = await Cart.findOne({userId}).populate("items.bookId");
-        if(!cart) return resHandler(res, 404, "Cart not found.");
+        const cart = await Cart.findOne({ userId }).populate("items.bookId");
+        if (!cart) return resHandler(res, 404, "Cart not found.");
         return resHandler(res, 200, "Cart fetched successfully", cart);
     } catch (error) {
         console.log("Error while getting user cart", error.message);

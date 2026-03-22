@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { fetchBooks } from "../redux/features/bookSlice";
+import { fetchBooks } from "../redux/features/book/bookSlice";
 
 const FiveColCard = () => {
   const dispatch = useDispatch();

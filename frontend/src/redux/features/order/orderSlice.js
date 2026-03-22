@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../../api/axios.js';
+import { placeOrderAPI } from '../../../api/orderAPI/orderAPI.js';
 
 // Thunk to place an order
 export const placeOrder = createAsyncThunk(
     'order/placeOrder',
     async (orderData, thunkAPI) => {
         try {
-            const response = await api.post('/orders', orderData);
+            const response = await placeOrderAPI(orderData);
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response?.data || 'Failed to place order');
