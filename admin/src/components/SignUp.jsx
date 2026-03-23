@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from 'react'
 
 const SignUp = () => {
   const [step, setStep] = useState('email')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [otp, setOtp] = useState(['', '', '', ''])
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -30,7 +32,7 @@ const SignUp = () => {
   return (
     <div className='w-full'>
       <h2 className='text-[34px] font-bold mb-10 tracking-tight text-[#1a1a1a]'>
-        {step === 'email' ? 'Sign Up' : step === 'code' ? 'Sing Up' : 'Set Password'}
+        {step === 'email' ? 'Sign Up' : step === 'code' ? 'Sign Up' : 'Set Password'}
       </h2>
 
       {step === 'email' ? (
@@ -54,7 +56,20 @@ const SignUp = () => {
 
           <p className='text-[13px] font-semibold text-[#1a1a1a] mb-5'>Or continue with email address</p>
 
-          <div className='relative mb-8'>
+          <div className='relative mb-5'>
+            <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
+              <i className="fa-regular fa-user text-gray-400 text-lg"></i>
+            </div>
+            <input
+              type="text"
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className='w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all text-sm placeholder:text-gray-400'
+            />
+          </div>
+
+          <div className='relative mb-5'>
             <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
               <i className="fa-regular fa-envelope text-gray-400 text-lg"></i>
             </div>
@@ -63,6 +78,19 @@ const SignUp = () => {
               placeholder="Your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className='w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all text-sm placeholder:text-gray-400'
+            />
+          </div>
+
+          <div className='relative mb-8'>
+            <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
+              <i className="fa-solid fa-phone text-gray-400 text-lg"></i>
+            </div>
+            <input
+              type="tel"
+              placeholder="Your phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className='w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all text-sm placeholder:text-gray-400'
             />
           </div>
@@ -76,6 +104,13 @@ const SignUp = () => {
         </>
       ) : step === 'code' ? (
         <>
+          <button
+            onClick={() => setStep('email')}
+            className='mb-6 text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-2 text-sm font-medium cursor-pointer group'
+          >
+            <i className="fa-solid fa-chevron-left text-xs transition-transform group-hover:-translate-x-1"></i>
+            Back
+          </button>
           <p className='text-[15px] font-semibold text-[#606060] mb-2'>We just send you a verify code to admin. Check your inbox to get them.</p>
           <p className='text-[13px] font-semibold text-[#1a1a1a] mb-5'>Enter the code we sent to Admin Email</p>
 
@@ -103,6 +138,13 @@ const SignUp = () => {
         </>
       ) : (
         <>
+          <button
+            onClick={() => setStep('code')}
+            className='mb-6 text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-2 text-sm font-medium cursor-pointer group'
+          >
+            <i className="fa-solid fa-chevron-left text-xs transition-transform group-hover:-translate-x-1"></i>
+            Back
+          </button>
           <p className='text-[15px] font-semibold text-[#606060] mb-8'>Please set a secure password for your account.</p>
 
           <div className='relative mb-4'>
@@ -116,7 +158,7 @@ const SignUp = () => {
               onChange={(e) => setPassword(e.target.value)}
               className='w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all text-sm placeholder:text-gray-400'
             />
-            <button 
+            <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className='absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer'
@@ -136,7 +178,7 @@ const SignUp = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className='w-full pl-12 pr-12 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-all text-sm placeholder:text-gray-400'
             />
-            <button 
+            <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className='absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer'

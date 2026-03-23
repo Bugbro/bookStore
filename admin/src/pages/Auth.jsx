@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets'
-import SignUp from '../components/SignUp'
-import SignIn from '../components/SignIn'
+import SignUp from '../components/SignUp.jsx'
+import SignIn from '../components/SignIn.jsx'
 
 const Auth = () => {
   const [isSignUP, setIsSignUp] = useState(true)

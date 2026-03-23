@@ -59,6 +59,19 @@ export const loginUser = async (req, res) => {
     }
 };
 
+//generate otp for admin to register new id in admin panel
+export const generateAdminOtp = async (req, res) => {
+    try {
+        const email = process.env.ADMIN_EMAIL;
+        if (!email) return resHandler(res, 400, "Please provide email.");
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        return resHandler(res, 200, "Otp generated successfully", { otp }, "otp");
+    } catch (error) {
+        console.log("Error while generating otp", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
+
 //login functionality for admin
 export const adminLogin = async (req, res) => {
     try {
