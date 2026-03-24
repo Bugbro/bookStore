@@ -1,5 +1,5 @@
 import express from "express"
-import { loginUser, registerUser, getCurrentUser, logoutUser, adminLogin } from "../controllers/authController.js";
+import { loginUser, registerUser, getCurrentUser, logoutUser, adminLogin, generateAdminOtp, verifyAdminOtp } from "../controllers/authController.js";
 import { authUser } from "../middleware/authMiddleware.js";
 
 const authRouter = express.Router();
@@ -10,7 +10,8 @@ authRouter.post("/logout", logoutUser);
 authRouter.get("/me", authUser, getCurrentUser);
 
 //admin login
-authRouter.get("/admin/otp",)
+authRouter.get("/admin/otp", generateAdminOtp);
+authRouter.post("/admin/verify-otp", verifyAdminOtp);
 authRouter.post("/admin/login", adminLogin);
 
 export default authRouter;

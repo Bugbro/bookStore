@@ -1,12 +1,14 @@
 import nodemailer from "nodemailer";
 
-const transpoter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.ADMIN_EMAIL,
-        pass: process.env.ADMIN_PASSWORD
-    },
-});
+const getTransporter = () => {
+    return nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.ADMIN_EMAIL,
+            pass: process.env.ADMIN_PASSWORD
+        },
+    });
+};
 
 export const sendMail = async (to, subject, text) => {
     try {
@@ -16,10 +18,12 @@ export const sendMail = async (to, subject, text) => {
             subject,
             text
         };
-        await transpoter.sendMail(mailOptions);
+        const transporter = getTransporter();
+        const info = await transporter.sendMail(mailOptions);
         console.log("Mail sent successfully");
+        return info;
     } catch (error) {
         console.log("Error while sending mail", error.message);
-
+        return { error: error.message };
     }
 };

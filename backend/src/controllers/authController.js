@@ -1,7 +1,9 @@
 import User from "../models/User.js";
+import { otpCache } from "../utils/cache.js";
 import { genJWTandSetCookies } from "../utils/genJWTandSetCookies.js";
 import { compareHash, hashValue } from "../utils/hash.js";
 import { resHandler } from "../utils/resHandler.js";
+import { sendMail } from "../utils/sendMail.js";
 
 export const registerUser = async (req, res) => {
     try {
@@ -63,11 +65,35 @@ export const loginUser = async (req, res) => {
 export const generateAdminOtp = async (req, res) => {
     try {
         const email = process.env.ADMIN_EMAIL;
-        if (!email) return resHandler(res, 400, "Please provide email.");
+        if (!email) return resHandler(res, 400, "Admin email not configured.");
         const otp = Math.floor(1000 + Math.random() * 9000);
+
+        const mailResponse = await sendMail(email, "Admin Otp", `Your Admin Login OTP is: ${otp}`);
+        
+        if (mailResponse && mailResponse.error) {
+            return resHandler(res, 500, "Failed to send OTP email.");
+        }
+
+        otpCache.set(email, otp);
         return resHandler(res, 200, "Otp generated successfully", { otp }, "otp");
     } catch (error) {
         console.log("Error while generating otp", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
+
+//verfiy otp for admin
+export const verifyAdminOtp = (req, res) => {
+    try {
+        const { otp } = req.body;
+        const email = process.env.ADMIN_EMAIL;
+        const storedOtp = otpCache.get(email);
+        if (!storedOtp) return resHandler(res, 400, "OTP not found");
+        if (parseInt(otp) !== storedOtp) return resHandler(res, 400, "Invalid OTP");
+        otpCache.del(email);
+        return resHandler(res, 200, "OTP verified successfully");
+    } catch (error) {
+        console.log("Error while verify admin otp", error.message);
         return resHandler(res, 500, error.message);
     }
 }

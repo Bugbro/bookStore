@@ -1,5 +1,6 @@
-import express from "express";
 import { configDotenv } from "dotenv";
+configDotenv();
+import express from "express";
 import { connectDB } from "./src/config/connectDB.js";
 import authRouter from "./src/routes/authRoutes.js";
 import adminRouter from "./src/routes/adminRoutes.js";
@@ -9,9 +10,6 @@ import orderRouter from "./src/routes/orderRoutes.js";
 import connectCloudinary from "./src/config/cloudinary.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-
-
-configDotenv();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
