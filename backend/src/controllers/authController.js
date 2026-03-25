@@ -69,13 +69,13 @@ export const generateAdminOtp = async (req, res) => {
         const otp = Math.floor(1000 + Math.random() * 9000);
 
         const mailResponse = await sendMail(email, "Admin Otp", `Your Admin Login OTP is: ${otp}`);
-        
+
         if (mailResponse && mailResponse.error) {
             return resHandler(res, 500, "Failed to send OTP email.");
         }
 
         otpCache.set(email, otp);
-        return resHandler(res, 200, "Otp generated successfully", { otp }, "otp");
+        return resHandler(res, 200, "Otp generated successfully");
     } catch (error) {
         console.log("Error while generating otp", error.message);
         return resHandler(res, 500, error.message);
@@ -90,10 +90,49 @@ export const verifyAdminOtp = (req, res) => {
         const storedOtp = otpCache.get(email);
         if (!storedOtp) return resHandler(res, 400, "OTP not found");
         if (parseInt(otp) !== storedOtp) return resHandler(res, 400, "Invalid OTP");
+        otpCache.set(`${email}_verified`, true, 600); // Mark as verified for 10 minutes
         otpCache.del(email);
         return resHandler(res, 200, "OTP verified successfully");
     } catch (error) {
         console.log("Error while verify admin otp", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
+
+//register functionality for admin
+export const adminRegister = async (req, res) => {
+    try {
+        const { name, email, phone, password } = req.body || {};
+        if (!name || !email || !phone || !password) return resHandler(res, 400, "Please provide all fields.");
+
+        // Check if OTP was verified for this session
+        const adminEmail = process.env.ADMIN_EMAIL;
+        const isVerified = otpCache.get(`${adminEmail}_verified`);
+        if (!isVerified) return resHandler(res, 400, "OTP verification required.");
+
+        const existUser = await User.findOne({ $or: [{ email }, { phone }] });
+        if (existUser) return resHandler(res, 400, "Email or Phone already exists.");
+
+        const hashedPassword = await hashValue(password);
+        const user = await User.create({
+            name,
+            email,
+            phone,
+            password: hashedPassword,
+            role: "admin"
+        });
+
+        otpCache.del(`${adminEmail}_verified`);
+        genJWTandSetCookies(res, user._id, user.role);
+        return resHandler(res, 201, "Admin registered successfully", {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone
+        }, "user");
+    } catch (error) {
+        console.log("Error while register admin", error.message);
         return resHandler(res, 500, error.message);
     }
 }

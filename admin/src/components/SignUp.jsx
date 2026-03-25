@@ -1,4 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
+import { adminGenerateOtpThunk, adminVerifyOtpThunk, adminRegisterThunk, clearAuthStates, resetOtpState, resetVerifyState } from '../redux/features/authSlice'
 
 const SignUp = () => {
   const [step, setStep] = useState('email')
@@ -10,7 +14,31 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  
+  const dispatch = useDispatch()
+  const { loading, error, message, otpSent, isVerified, user } = useSelector((state) => state.auth)
   const inputRefs = [useRef(), useRef(), useRef(), useRef()]
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error)
+      dispatch(clearAuthStates())
+    }
+    if (message) {
+      toast.success(message)
+      dispatch(clearAuthStates())
+    }
+  }, [error, message, dispatch])
+
+  useEffect(() => {
+    if (otpSent && step === 'email') {
+      setStep('code')
+    }
+    if (isVerified && step === 'code') {
+      setStep('password')
+    }
+  }, [otpSent, isVerified, step])
 
   const handleOtpChange = (index, value) => {
     if (isNaN(value)) return
@@ -27,6 +55,52 @@ const SignUp = () => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs[index - 1].current.focus()
     }
+  }
+
+  const handleGenerateOtp = () => {
+    if (!name || !email || !phone) {
+      return toast.warning("Please fill all fields")
+    }
+    dispatch(adminGenerateOtpThunk())
+  }
+
+  const handleVerifyOtp = () => {
+    const otpString = otp.join('')
+    if (otpString.length < 4) {
+      return toast.warning("Please enter full OTP")
+    }
+    dispatch(adminVerifyOtpThunk({ otp: otpString }))
+  }
+
+  const handleRegister = async () => {
+    if (!password || !confirmPassword) {
+      return toast.warning("Please enter passwords")
+    }
+    if (password !== confirmPassword) {
+      return toast.error("Passwords do not match")
+    }
+    const res = await dispatch(adminRegisterThunk({ name, email, phone, password }))
+    if (res.meta.requestStatus === 'fulfilled') {
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 1500)
+    }
+  }
+
+  useEffect(() => {
+    if (user && step === 'password') { // Only redirect if user was created in registration step
+       navigate('/dashboard')
+    }
+  }, [user, navigate])
+
+  const handleBackToEmail = () => {
+    dispatch(resetOtpState())
+    setStep('email')
+  }
+
+  const handleBackToCode = () => {
+    dispatch(resetVerifyState())
+    setStep('code')
   }
 
   return (
@@ -96,23 +170,24 @@ const SignUp = () => {
           </div>
 
           <button
-            onClick={() => setStep('code')}
-            className='w-full bg-[#d2d2d2] text-white font-bold py-3.5 rounded-xl hover:bg-gray-400 transition-all mb-8 shadow-sm active:scale-[0.98] cursor-pointer'
+            onClick={handleGenerateOtp}
+            disabled={loading}
+            className={`w-full ${loading ? 'bg-gray-400' : 'bg-[#1a1a1a]'} text-white font-bold py-3.5 rounded-xl hover:bg-black transition-all mb-8 shadow-sm active:scale-[0.98] cursor-pointer`}
           >
-            Continue
+            {loading ? "Sending..." : "Continue"}
           </button>
         </>
       ) : step === 'code' ? (
         <>
           <button
-            onClick={() => setStep('email')}
+            onClick={handleBackToEmail}
             className='mb-6 text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-2 text-sm font-medium cursor-pointer group'
           >
             <i className="fa-solid fa-chevron-left text-xs transition-transform group-hover:-translate-x-1"></i>
             Back
           </button>
-          <p className='text-[15px] font-semibold text-[#606060] mb-2'>We just send you a verify code to admin. Check your inbox to get them.</p>
-          <p className='text-[13px] font-semibold text-[#1a1a1a] mb-5'>Enter the code we sent to Admin Email</p>
+          <p className='text-[15px] font-semibold text-[#606060] mb-2'>We just sent a verify code to admin. Check the inbox to get it.</p>
+          <p className='text-[13px] font-semibold text-[#1a1a1a] mb-5 text-red-500 underline'>Enter the code sent to Admin Email</p>
 
           <div className='flex gap-3 mb-10'>
             {otp.map((digit, index) => (
@@ -130,16 +205,17 @@ const SignUp = () => {
           </div>
 
           <button
-            onClick={() => setStep('password')}
-            className='w-full bg-[#1a1a1a] text-white font-bold py-3.5 rounded-xl hover:bg-black transition-all mb-8 shadow-sm active:scale-[0.98] cursor-pointer'
+            onClick={handleVerifyOtp}
+            disabled={loading}
+            className={`w-full ${loading ? 'bg-gray-400' : 'bg-[#1a1a1a]'} text-white font-bold py-3.5 rounded-xl hover:bg-black transition-all mb-8 shadow-sm active:scale-[0.98] cursor-pointer`}
           >
-            Continue
+            {loading ? "Verifying..." : "Verify Code"}
           </button>
         </>
       ) : (
         <>
           <button
-            onClick={() => setStep('code')}
+            onClick={handleBackToCode}
             className='mb-6 text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-2 text-sm font-medium cursor-pointer group'
           >
             <i className="fa-solid fa-chevron-left text-xs transition-transform group-hover:-translate-x-1"></i>
@@ -187,8 +263,12 @@ const SignUp = () => {
             </button>
           </div>
 
-          <button className='w-full bg-[#1a1a1a] text-white font-bold py-3.5 rounded-xl hover:bg-black transition-all mb-8 shadow-sm active:scale-[0.98] cursor-pointer'>
-            Finish Sign Up
+          <button
+            onClick={handleRegister}
+            disabled={loading}
+            className={`w-full ${loading ? 'bg-gray-400' : 'bg-[#1a1a1a]'} text-white font-bold py-3.5 rounded-xl hover:bg-black transition-all mb-8 shadow-sm active:scale-[0.98] cursor-pointer`}
+          >
+            {loading ? "Creating Account..." : "Finish Sign Up"}
           </button>
         </>
       )}
