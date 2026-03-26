@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Auth from './pages/Auth'
-import { Dashboard } from './pages/Dashboard'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { getMeThunk } from './redux/features/authSlice'
+
+// Views & Layouts
+import { AdminLayout } from './components/AdminLayout'
+import DashboardContent from './components/DashboardContent'
+import { BooksList } from './components/BooksList'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -27,11 +31,26 @@ const App = () => {
     <>
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
-        <Route path='/' element={user ? <Navigate to="/dashboard" /> : <Auth />} />
-        <Route path='/dashboard' element={user ? <Dashboard /> : <Navigate to="/" />} />
+        {/* Auth Route */}
+        <Route path='/auth' element={!user ? <Auth /> : <Navigate to="/dashboard" />} />
+
+        {/* Protected Admin Routes */}
+        <Route path='/' element={user ? <AdminLayout /> : <Navigate to="/auth" />}>
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardContent />} />
+          <Route path="books" element={<BooksList />} />
+          <Route path="users" element={<div className="p-4">Users List Content</div>} />
+          <Route path="settings" element={<div className="p-4">Settings Page Content</div>} />
+          <Route path="categories" element={<div className="p-4">Categories Content</div>} />
+          <Route path="analytics" element={<div className="p-4">Analytics Content</div>} />
+          <Route path="reviews" element={<div className="p-4">Reviews Content</div>} />
+        </Route>
+
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   )
 }
 
-export default App
+export default App;

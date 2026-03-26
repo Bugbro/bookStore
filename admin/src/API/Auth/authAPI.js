@@ -1,4 +1,4 @@
-import api from "../BaseAPI/api.js";
+import api from "../baseapi/api.js";
 
 export const registerAPI = (data) => {
     return api.post("/auth/admin/register", data);
