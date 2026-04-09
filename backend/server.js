@@ -1,6 +1,8 @@
 import { configDotenv } from "dotenv";
 configDotenv();
 import express from "express";
+import http from "http";
+import { Server } from "socket.io";
 import { connectDB } from "./src/config/connectDB.js";
 import authRouter from "./src/routes/authRoutes.js";
 import adminRouter from "./src/routes/adminRoutes.js";
@@ -10,15 +12,19 @@ import orderRouter from "./src/routes/orderRoutes.js";
 import connectCloudinary from "./src/config/cloudinary.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { initSocket } from "./src/sockets/socketManager.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 connectDB();
 connectCloudinary();
 
+const server = http.createServer(app);
+
 //cors setup for admin and frontend
 const allowedOrigins = [
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "http://localhost:5174"
 ];
 
 app.use(cors({
@@ -43,6 +49,16 @@ app.use("/api/cart", cartRouter);
 app.use("/api/books", bookRouter);
 app.use("/api/orders", orderRouter);
 
-app.listen(PORT, ()=>{
-    console.log(`Server is running at ${PORT}`);
+//setup socket io
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
+
+initSocket(io);
+
+server.listen(PORT, () => {
+  console.log(`Server is running at ${PORT}`);
 });

@@ -28,6 +28,22 @@ function App() {
     }
   }, [user, dispatch]);
 
+
+  // Socket.io setup for tracking active users
+  useEffect(() => {
+    import('./socket/socket.js').then(({ socket }) => {
+      // Listen for the connect event instead of logging immediately
+      socket.on('connect', () => {
+        console.log("Socket connected:", socket.id);
+      });
+      // Also log if it's already connected (just in case)
+      if (socket.connected) {
+        console.log("Socket connected immediately:", socket.id);
+      }
+    });
+  }, []);
+
+
   return (
     <>
       <ToastContainer position='top-right' />

@@ -12,7 +12,7 @@ export const BooksList = () => {
 
             <div className={`rounded-2xl ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"} border p-8 flex flex-col items-center justify-center min-h-[400px]`}>
                 <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
-                    <i className="fa-solid fa-books text-indigo-600 text-2xl"></i>
+                    <i className="fa-solid fa-book-open text-indigo-600 text-2xl"></i>
                 </div>
                 <h2 className={`text-lg font-semibold ${darkMode ? "text-white" : "text-gray-800"}`}>Books List Coming Soon!</h2>
                 <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"} text-center max-w-sm mt-2`}>

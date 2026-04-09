@@ -1,11 +1,10 @@
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import AddBook from './AddBook.jsx';
+import { fetchAllBooks } from '../redux/features/Book/bookSlice.js';
+import { fetchOrders } from '../redux/features/Order/orderSlice.js';
+import { getTotalRevenue } from '../redux/features/Admin/adminDashboardSlice.js';
 
-const stats = [
-    { label: "Total Books", value: "4,821", icon: "fa-book-open", change: "+12%", color: "#f59e0b" },
-    { label: "Orders Today", value: "138", icon: "fa-shopping-cart", change: "+8%", color: "#10b981" },
-    { label: "Total Revenue", value: "₹2,34,500", icon: "fa-indian-rupee-sign", change: "+21%", color: "#6366f1" },
-    { label: "Active Users", value: "1,209", icon: "fa-users", change: "+5%", color: "#ef4444" },
-];
 
 const recentOrders = [
     { id: "#ORD-001", customer: "Arjun Sharma", book: "The Midnight Library", amount: "₹499", status: "Delivered", date: "26 Mar 2026" },
@@ -30,7 +29,33 @@ const statusColor = {
 };
 
 export default function DashboardContent() {
+    const dispatch = useDispatch();
+    const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
     const darkMode = useSelector(state => state.theme.darkMode);
+    const { books, loading: bookLoading } = useSelector(state => state.book);
+    const { ordersByRange, loading: orderLoading } = useSelector(state => state.order || {});
+    const todayOrders = ordersByRange?.today || [];
+    const { totalRevenue, loading: totalRevenueLoading } = useSelector(state => state.adminDashboard || {});
+    const { activeUsers } = useSelector((state) => state.socket);
+
+    useEffect(() => {
+        if (!books || books.length === 0) {
+            dispatch(fetchAllBooks());
+        }
+        if (ordersByRange?.today === undefined) {
+            dispatch(fetchOrders("today"));
+        }
+        if (totalRevenue === undefined) {
+            dispatch(getTotalRevenue());
+        }
+    }, [dispatch, books, ordersByRange]);
+
+    const stats = [
+        { label: "Total Books", value: bookLoading ? "...." : books?.length, icon: "fa-book-open", change: "+12%", color: "#f59e0b" },
+        { label: "Orders Today", value: orderLoading ? "...." : todayOrders?.length, icon: "fa-shopping-cart", change: "+8%", color: "#10b981" },
+        { label: "Total Revenue", value: totalRevenueLoading ? "...." : totalRevenue, icon: "fa-indian-rupee-sign", change: "+21%", color: "#6366f1" },
+        { label: "Active Users", value: activeUsers, icon: "fa-users", change: "+5%", color: "#ef4444" },
+    ];
 
     return (
         <div className="fade-in">
@@ -77,17 +102,27 @@ export default function DashboardContent() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {recentOrders.map((o, i) => (
-                                    <tr key={i} className={`border-t ${darkMode ? "border-gray-800" : "border-gray-50"}`}>
-                                        <td className="py-3 text-indigo-500 font-medium">{o.id}</td>
-                                        <td className={`py-3 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{o.customer}</td>
-                                        <td className={`py-3 hidden md:table-cell ${darkMode ? "text-gray-400" : "text-gray-500"} text-xs`}>{o.book}</td>
-                                        <td className={`py-3 font-semibold ${darkMode ? "text-white" : "text-gray-800"}`}>{o.amount}</td>
-                                        <td className="py-3">
-                                            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusColor[o.status]}`}>{o.status}</span>
-                                        </td>
+                                {todayOrders.slice(0, 5).map((o, i) => {
+                                    const statusCapitalized = o.status ? o.status.charAt(0).toUpperCase() + o.status.slice(1) : "Pending";
+                                    const bookName = o.items && o.items.length > 0 ? o.items[0]?.bookId?.title : "N/A";
+                                    const finalBookDisplay = o.items && o.items.length > 1 ? `${bookName} +${o.items.length - 1}` : bookName;
+                                    return (
+                                        <tr key={o._id || i} className={`border-t ${darkMode ? "border-gray-800" : "border-gray-50"}`}>
+                                            <td className="py-3 text-indigo-500 font-medium">#{o._id ? o._id.slice(-6).toUpperCase() : "N/A"}</td>
+                                            <td className={`py-3 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{o.deliveryAddress?.name || "N/A"}</td>
+                                            <td className={`py-3 hidden md:table-cell ${darkMode ? "text-gray-400" : "text-gray-500"} text-xs`}>{finalBookDisplay}</td>
+                                            <td className={`py-3 font-semibold ${darkMode ? "text-white" : "text-gray-800"}`}>₹{o.totalAmount}</td>
+                                            <td className="py-3">
+                                                <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusColor[statusCapitalized] || statusColor.Pending}`}>{statusCapitalized}</span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {todayOrders.length === 0 && !orderLoading && (
+                                    <tr>
+                                        <td colSpan="5" className={`py-4 text-center text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>No orders today.</td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -98,13 +133,13 @@ export default function DashboardContent() {
                     <h2 className={`font-semibold mb-4 ${darkMode ? "text-white" : "text-gray-800"}`}>Quick Actions</h2>
                     <div className="space-y-2">
                         {[
-                            { icon: "fa-plus", label: "Add New Book", color: "bg-indigo-600 hover:bg-indigo-700" },
+                            { icon: "fa-plus", label: "Add New Book", color: "bg-indigo-600 hover:bg-indigo-700", action: () => setIsAddBookModalOpen(true) },
                             { icon: "fa-truck", label: "Process Orders", color: "bg-emerald-600 hover:bg-emerald-700" },
                             { icon: "fa-tag", label: "Manage Discounts", color: "bg-amber-500 hover:bg-amber-600" },
                             { icon: "fa-download", label: "Export Reports", color: "bg-slate-600 hover:bg-slate-700" },
                             { icon: "fa-bullhorn", label: "Send Newsletter", color: "bg-purple-600 hover:bg-purple-700" },
                         ].map((a, i) => (
-                            <button key={i} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-white text-sm font-medium transition-colors ${a.color}`}>
+                            <button key={i} onClick={a.action} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-white text-sm font-medium transition-colors ${a.color}`}>
                                 <i className={`fa-solid ${a.icon} w-4 text-center`}></i> {a.label}
                             </button>
                         ))}
@@ -170,6 +205,9 @@ export default function DashboardContent() {
                     </table>
                 </div>
             </div>
+
+            {/* Modal Components */}
+            {isAddBookModalOpen && <AddBook onClose={() => setIsAddBookModalOpen(false)} />}
         </div>
     );
 }

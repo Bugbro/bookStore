@@ -4,16 +4,30 @@ import Auth from './pages/Auth'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMeThunk } from './redux/features/authSlice'
+import { getMeThunk } from './redux/features/authSlice.js'
+import { socket } from "./socket/socket.js";
 
 // Views & Layouts
 import { AdminLayout } from './components/AdminLayout'
 import DashboardContent from './components/DashboardContent'
 import { BooksList } from './components/BooksList'
+import { Orders } from './components/Orders.jsx'
+import { setActiveUsers } from './redux/features/Socket/socketSlice'
 
 const App = () => {
   const dispatch = useDispatch()
   const { user, checked, loading } = useSelector(state => state.auth)
+
+
+  useEffect(() => {
+    socket.on("activeUsers", (count) => {
+      console.log("Active users from backend:", count);
+      dispatch(setActiveUsers(count));
+    });
+    return () => {
+      socket.off("activeUsers");
+    };
+  }, []);
 
   useEffect(() => {
     dispatch(getMeThunk())
@@ -39,6 +53,7 @@ const App = () => {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardContent />} />
           <Route path="books" element={<BooksList />} />
+          <Route path="orders" element={<Orders />} />
           <Route path="users" element={<div className="p-4">Users List Content</div>} />
           <Route path="settings" element={<div className="p-4">Settings Page Content</div>} />
           <Route path="categories" element={<div className="p-4">Categories Content</div>} />

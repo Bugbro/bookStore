@@ -10,38 +10,38 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    price: {
+    sellingPrice: {
         type: Number,
         required: true,
     },
-    discount: {
+    actualPrice: {
         type: Number,
-        default: 0
+        required: true,
     },
-    category:{
+    category: {
         type: String,
         required: true,
         index: true,
         lowercase: true,
     },
-    images:{
+    images: {
         type: [String],
         required: true
     },
-    description:{
+    description: {
         type: String,
         required: true,
     },
-    stock:{
+    stock: {
         type: Number,
         default: 10,
     },
-    rating:{
+    rating: {
         type: Number,
-        min:0,
-        max:5,
+        min: 0,
+        max: 5,
         default: 0,
     },
-},{timestamps: true});
+}, { timestamps: true });
 
 export default mongoose.model("Book", bookSchema);

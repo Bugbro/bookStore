@@ -1,5 +1,5 @@
 import express from "express";
-import { getOrderById, getUserOrders, placeOrder, updateOrderStatus } from "../controllers/orderController.js";
+import { getOrderById, getOrders, getUserOrders, placeOrder } from "../controllers/orderController.js";
 import { authUser } from "../middleware/authMiddleware.js";
 
 const orderRouter = express.Router();
@@ -10,5 +10,8 @@ orderRouter.get('/:id', authUser, getOrderById);
 
 //admin
 // orderRouter.put('/:id', updateOrderStatus);
+// orderRouter.get('/today', getTodayOrders);
+// orderRouter.get('/all', getAllOrders);
+orderRouter.get('/', getOrders);
 
 export default orderRouter;
