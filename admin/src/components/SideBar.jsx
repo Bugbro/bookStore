@@ -16,6 +16,8 @@ export const SideBar = ({ sidebarOpen }) => {
     const darkMode = useSelector(state => state.theme.darkMode);
     const location = useLocation();
 
+
+
     return (
         <aside className={`${sidebarOpen ? "w-64" : "w-16"} sidebar-transition flex-shrink-0 ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"} border-r flex flex-col`}>
             {/* Logo */}
