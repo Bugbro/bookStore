@@ -3,13 +3,15 @@ import bookReducer from "./features/book/bookSlice.js";
 import cartReducer from "./features/cart/cartSlice.js";
 import authReducer from "./features/auth/authSlice.js";
 import orderReducer from "./features/order/orderSlice.js";
+import recommendationReducer from "./features/recommendation/recommendationSlice.js";
 
 export const store = configureStore({
     reducer: {
         books: bookReducer,
         cart: cartReducer,
         auth: authReducer,
-        order: orderReducer
+        order: orderReducer,
+        recommendation: recommendationReducer
     }
 });
 

@@ -98,31 +98,31 @@ const Navbar = () => {
                   }
                 }}
               />
-              <button 
-                onClick={() => { setIsSearchFocused(false); navigate(searchTerm ? `/products?search=${searchTerm}` : "/products"); }} 
+              <button
+                onClick={() => { setIsSearchFocused(false); navigate(searchTerm ? `/products?search=${searchTerm}` : "/products"); }}
                 className="bg-[#17BD8D] text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#15ae83] hover:shadow-md transition-all duration-200 shrink-0 group-hover:scale-105"
               >
                 <i className="fas fa-search text-sm"></i>
               </button>
             </div>
-            
+
             {/* Search Dropdown */}
             {isSearchFocused && searchTerm && books?.data && (
               <div className="absolute top-[110%] left-0 w-full bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 overflow-hidden max-h-80 overflow-y-auto">
                 {books.data.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).length > 0 ? (
-                    books.data.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(book => (
-                      <div key={book._id} onClick={() => { setIsSearchFocused(false); navigate(`/products/${book._id}`); }} className="flex items-center gap-3 p-3 hover:bg-green-50/50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors duration-150">
-                        <img src={book.images[0]} alt={book.title} className="w-10 h-14 object-cover rounded-md shadow-sm border border-gray-100" />
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-sm text-gray-800 line-clamp-1">{book.title}</span>
-                          <span className="text-xs text-gray-500 mt-0.5">{book.author}</span>
-                        </div>
+                  books.data.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(book => (
+                    <div key={book._id} onClick={() => { setIsSearchFocused(false); navigate(`/products/${book._id}`); }} className="flex items-center gap-3 p-3 hover:bg-green-50/50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors duration-150">
+                      <img src={book.images[0]} alt={book.title} className="w-10 h-14 object-cover rounded-md shadow-sm border border-gray-100" />
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-sm text-gray-800 line-clamp-1">{book.title}</span>
+                        <span className="text-xs text-gray-500 mt-0.5">{book.author}</span>
                       </div>
-                    ))
-                ) : (
-                    <div className="p-4 text-center text-sm text-gray-500 bg-gray-50/50">
-                        No books found for "{searchTerm}"
                     </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-sm text-gray-500 bg-gray-50/50">
+                    No books found for "{searchTerm}"
+                  </div>
                 )}
               </div>
             )}
@@ -137,7 +137,7 @@ const Navbar = () => {
                 Find a book store
               </span>
             </a>
-            
+
             {user ? (
               <div className="relative group cursor-pointer">
                 <div className="flex items-center gap-2 text-[#17BD8D]">
@@ -150,9 +150,9 @@ const Navbar = () => {
                 <div className="absolute right-0 top-8 pt-4 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                   <div className="bg-white border border-gray-100 shadow-xl rounded-xl overflow-hidden">
                     <div className="p-4 border-b border-gray-100 bg-gray-50 flex flex-col gap-1">
-                       <p className="font-bold text-gray-800 break-words">{user.name}</p>
-                       <p className="text-xs text-gray-500 break-words">{user.email}</p>
-                       {user.phone && <p className="text-xs text-gray-500">{user.phone}</p>}
+                      <p className="font-bold text-gray-800 break-words">{user.name}</p>
+                      <p className="text-xs text-gray-500 break-words">{user.email}</p>
+                      {user.phone && <p className="text-xs text-gray-500">{user.phone}</p>}
                     </div>
                     <ul className="py-2 text-sm text-gray-700">
                       <li className="px-4 py-2 hover:bg-gray-50 hover:text-[#17BD8D] flex items-center gap-3">
@@ -161,7 +161,7 @@ const Navbar = () => {
                       <li className="px-4 py-2 hover:bg-gray-50 hover:text-[#17BD8D] flex items-center gap-3">
                         <i className="fa-regular fa-heart w-4 text-center"></i> Wishlist
                       </li>
-                      <li 
+                      <li
                         onClick={handleLogout}
                         className="px-4 py-3 hover:bg-red-50 text-red-600 flex items-center gap-3 border-t border-gray-100 mt-1"
                       >
@@ -222,6 +222,7 @@ const Navbar = () => {
         <div className="flex gap-6 text-sm font-bold text-[#0f8967]">
           <Link to="/">Home</Link>
           <Link to="/products">Products</Link>
+          <Link to="/recommend">Recommend</Link>
           <Link to="/blog">Blog</Link>
           <Link to="/contact">Contact</Link>
           <Link to="/about">About Us</Link>
@@ -244,9 +245,9 @@ const Navbar = () => {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
       />
-      <LoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </>
   );

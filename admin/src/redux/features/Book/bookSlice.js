@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAllBooksAPI, addBookAPI } from '../../../api/bookapi/bookapi.js'
+import { getAllBooksAPI, addBookAPI, updateBookAPI, deleteBookAPI } from '../../../api/bookapi/bookapi.js'
 
 export const fetchAllBooks = createAsyncThunk(
     "book/fetchAllBooks", async (_, { rejectWithValue }) => {
@@ -19,6 +19,28 @@ export const addBook = createAsyncThunk(
             return res.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Failed to add book");
+        }
+    }
+);
+
+export const updateBook = createAsyncThunk(
+    "book/updateBook", async ({ id, data }, { rejectWithValue }) => {
+        try {
+            const res = await updateBookAPI(id, data);
+            return res.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to update book");
+        }
+    }
+);
+
+export const deleteBook = createAsyncThunk(
+    "book/deleteBook", async (id, { rejectWithValue }) => {
+        try {
+            await deleteBookAPI(id);
+            return id; // Return the deleted book's ID
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to delete book");
         }
     }
 );
@@ -68,6 +90,36 @@ const bookSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            //update book
+            .addCase(updateBook.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updateBook.fulfilled, (state, action) => {
+                state.loading = false;
+                const updatedBook = action.payload.data;
+                state.books = state.books.map(book => 
+                    book._id === updatedBook._id ? updatedBook : book
+                );
+            })
+            .addCase(updateBook.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            //delete book
+            .addCase(deleteBook.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(deleteBook.fulfilled, (state, action) => {
+                state.loading = false;
+                const id = action.payload;
+                state.books = state.books.filter(book => book._id !== id);
+            })
+            .addCase(deleteBook.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 });
 

@@ -9,7 +9,7 @@ const CartPop = ({ isOpen, onCheckoutClick }) => {
     (total, item) => total + item.price * item.quantity,
     0,
   );
-  console.log(cartItems);
+
 
   if (!isOpen) return null;
   return (

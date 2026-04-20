@@ -6,3 +6,9 @@ export const getAllBooksAPI = () => {
 export const addBookAPI = (data) => {
     return api.post("/books", data);
 }
+export const updateBookAPI = (id, data) => {
+    return api.put(`/books/${id}`, data);
+}
+export const deleteBookAPI = (id) => {
+    return api.delete(`/books/${id}`);
+}

@@ -2,6 +2,7 @@ import Book from "../models/Book.js";
 import { resHandler } from "../utils/resHandler.js"
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import axios from "axios";
 
 //for admin
 export const createBook = async (req, res) => {
@@ -126,3 +127,28 @@ export const getBooksByCategory = async (req, res) => {
         return resHandler(res, 500, error.message);
     }
 };
+
+//for recommendation service from python model
+export const getPopularBooks = async (req, res) => {
+    try {
+        const response = await axios.get("http://localhost:8000/popular");
+        return resHandler(res, 200, "Books get successfully", response.data);
+    } catch (error) {
+        console.log("Error while getting popular books", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
+
+export const getRecommendationBooks = async (req, res) => {
+    try {
+        const { bookName } = req.params;
+        // need to think about like if not book found so how.? like we not sell that book
+        // const book = await Book.findOne({ title: bookName });
+        // if (!book) return resHandler(res, 404, "Book not found.");
+        const response = await axios.get(`http://localhost:8000/recommendations/${bookName}`);
+        return resHandler(res, 200, "Books get successfully", response.data.recommendations);
+    } catch (error) {
+        console.log("Error while getting recommendation books", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}

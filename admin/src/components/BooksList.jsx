@@ -1,14 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllBooks } from '../redux/features/Book/bookSlice';
+import { deleteBook, fetchAllBooks } from '../redux/features/Book/bookSlice';
+import AddBook from './AddBook';
 
 export const BooksList = () => {
 
     const dispatch = useDispatch();
     const darkMode = useSelector(state => state.theme.darkMode);
     const { books } = useSelector(state => state.book);
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    console.log(books);
+    const handleEditClick = (book) => {
+        setSelectedBook(book);
+        setIsEditModalOpen(true);
+    };
+
+    const handleDeleteClick = (id) => {
+        if (window.confirm("Are you sure you want to delete this book?")) {
+            dispatch(deleteBook(id));
+        }
+    }
 
     useEffect(() => {
         if (books.length === 0) {
@@ -52,10 +64,10 @@ export const BooksList = () => {
                                 <tr key={book._id} className={`${darkMode ? "divide-gray-800 hover:bg-gray-800/40" : "divide-gray-200 hover:bg-gray-50"} transition-colors`}>
                                     <td className="py-4 px-6">
                                         <div className="w-12 h-16 rounded-md overflow-hidden border border-gray-200/20 shadow-sm">
-                                            <img 
-                                                src={book.images?.[0] || 'https://via.placeholder.com/150'} 
-                                                alt={book.title} 
-                                                className="w-full h-full object-cover" 
+                                            <img
+                                                src={book.images?.[0] || 'https://via.placeholder.com/150'}
+                                                alt={book.title}
+                                                className="w-full h-full object-cover"
                                             />
                                         </div>
                                     </td>
@@ -73,10 +85,10 @@ export const BooksList = () => {
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center justify-center gap-2">
-                                            <button className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${darkMode ? "hover:bg-gray-700 text-blue-400" : "hover:bg-blue-50 text-blue-600"}`} title="Edit">
+                                            <button onClick={() => handleEditClick(book)} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${darkMode ? "hover:bg-gray-700 text-blue-400" : "hover:bg-blue-50 text-blue-600"}`} title="Edit">
                                                 <i className="fa-solid fa-pen-to-square"></i>
                                             </button>
-                                            <button className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${darkMode ? "hover:bg-gray-700 text-red-400" : "hover:bg-red-50 text-red-600"}`} title="Delete">
+                                            <button onClick={() => handleDeleteClick(book._id)} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${darkMode ? "hover:bg-gray-700 text-red-400" : "hover:bg-red-50 text-red-600"}`} title="Delete">
                                                 <i className="fa-solid fa-trash"></i>
                                             </button>
                                         </div>
@@ -86,6 +98,17 @@ export const BooksList = () => {
                         </tbody>
                     </table>
                 </div>
+            )}
+
+            {isEditModalOpen && (
+                <AddBook
+                    onClose={() => {
+                        setIsEditModalOpen(false);
+                        setSelectedBook(null);
+                    }}
+                    isEdit={true}
+                    initialData={selectedBook}
+                />
             )}
         </div>
     );

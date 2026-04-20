@@ -1,32 +1,53 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { addBook } from '../redux/features/Book/bookSlice';
+import { addBook, updateBook } from '../redux/features/Book/bookSlice';
 
-export default function AddBook({ onClose }) {
+export default function AddBook({ onClose, isEdit = false, initialData = null }) {
     const darkMode = useSelector(state => state.theme.darkMode);
     const dispatch = useDispatch();
     const { loading } = useSelector(state => state.book);
-    const [formData, setFormData] = useState({
-        title: '',
-        author: '',
-        sellingPrice: '',
-        actualPrice: '',
-        stock: '',
-        category: '',
-        description: '',
-        image1: null,
-        image2: null,
-        image3: null,
-        image4: null
-    });
+    const [formData, setFormData] = useState(
+        initialData ? {
+            title: initialData.title || '',
+            author: initialData.author || '',
+            sellingPrice: initialData.sellingPrice || '',
+            actualPrice: initialData.actualPrice || '',
+            stock: initialData.stock || '',
+            category: initialData.category || '',
+            description: initialData.description || '',
+            image1: null,
+            image2: null,
+            image3: null,
+            image4: null
+        } : {
+            title: '',
+            author: '',
+            sellingPrice: '',
+            actualPrice: '',
+            stock: '',
+            category: '',
+            description: '',
+            image1: null,
+            image2: null,
+            image3: null,
+            image4: null
+        }
+    );
 
-    const [previews, setPreviews] = useState({
-        image1: null,
-        image2: null,
-        image3: null,
-        image4: null
-    });
+    const [previews, setPreviews] = useState(
+        initialData?.images && initialData.images.length > 0 ? {
+            image1: initialData.images[0] || null,
+            image2: initialData.images[1] || null,
+            image3: initialData.images[2] || null,
+            image4: initialData.images[3] || null
+        } : {
+            image1: null,
+            image2: null,
+            image3: null,
+            image4: null
+        }
+    );
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -44,8 +65,28 @@ export default function AddBook({ onClose }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.image1 || !formData.image2 || !formData.image3 || !formData.image4) {
+        if (!isEdit && (!formData.image1 || !formData.image2 || !formData.image3 || !formData.image4)) {
             toast.error("Please upload all 4 book cover images.");
+            return;
+        }
+
+        if (isEdit) {
+            const updatePayload = {
+                title: formData.title,
+                author: formData.author,
+                sellingPrice: formData.sellingPrice,
+                actualPrice: formData.actualPrice,
+                stock: formData.stock,
+                category: formData.category,
+                description: formData.description,
+            };
+            try {
+                await dispatch(updateBook({ id: initialData._id, data: updatePayload })).unwrap();
+                toast.success("Book updated successfully!");
+                onClose();
+            } catch (error) {
+                toast.error(error || "Failed to update book");
+            }
             return;
         }
 
@@ -77,8 +118,8 @@ export default function AddBook({ onClose }) {
                 {/* Header */}
                 <div className={`flex items-center justify-between p-5 border-b ${darkMode ? "border-gray-800" : "border-gray-100"}`}>
                     <div>
-                        <h2 className={`font-bold text-xl ${darkMode ? "text-white" : "text-gray-800"}`}>Add New Book</h2>
-                        <p className={`text-xs mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Fill in the details below to add a new book to the inventory.</p>
+                        <h2 className={`font-bold text-xl ${darkMode ? "text-white" : "text-gray-800"}`}>{isEdit ? "Update Book" : "Add New Book"}</h2>
+                        <p className={`text-xs mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{isEdit ? "Update the details below to modify the book in the inventory." : "Fill in the details below to add a new book to the inventory."}</p>
                     </div>
                     <button onClick={onClose} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${darkMode ? "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700" : "bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-gray-200"}`}>
                         <i className="fa-solid fa-xmark text-sm"></i>
@@ -134,7 +175,7 @@ export default function AddBook({ onClose }) {
 
                         {/* Image Upload Area */}
                         <div className="space-y-1.5 sm:col-span-2">
-                            <label className={`text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Book Cover Images (All 4 required) <span className="text-rose-500">*</span></label>
+                            <label className={`text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Book Cover Images {isEdit ? "(Image update not supported)" : "(All 4 required)"} {!isEdit && <span className="text-rose-500">*</span>}</label>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
                                 {[1, 2, 3, 4].map((index) => (
                                     <label key={index} className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${darkMode ? "border-gray-700 bg-gray-800/50 hover:bg-gray-800" : "border-gray-300 bg-gray-50 hover:bg-gray-100"}`}>
@@ -151,11 +192,11 @@ export default function AddBook({ onClose }) {
                                                 <div className="flex flex-col items-center justify-center pt-5 pb-6 px-2">
                                                     <i className={`fa-solid fa-cloud-arrow-up text-2xl mb-2 ${darkMode ? "text-gray-500" : "text-gray-400"}`}></i>
                                                     <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}><span className="font-semibold text-indigo-500">Image {index}</span></p>
-                                                    <span className="text-[10px] text-rose-500 mt-1">Required</span>
+                                                    <span className="text-[10px] text-rose-500 mt-1">{!isEdit ? "Required" : ""}</span>
                                                 </div>
                                             )}
                                         </div>
-                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, index)} />
+                                        <input type="file" className="hidden" accept="image/*" disabled={isEdit} onChange={(e) => handleFileChange(e, index)} />
                                     </label>
                                 ))}
                             </div>
@@ -167,7 +208,7 @@ export default function AddBook({ onClose }) {
                         <button type="button" onClick={onClose} disabled={loading} className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${darkMode ? "text-gray-300 hover:bg-gray-800" : "text-gray-600 hover:bg-gray-100"} disabled:opacity-50`}>Cancel</button>
                         <button type="submit" disabled={loading} className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 text-white text-sm font-medium shadow-sm transition-colors flex items-center gap-2">
                             {loading ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-cloud-arrow-up"></i>}
-                            {loading ? "Publishing..." : "Publish Book"}
+                            {loading ? (isEdit ? "Updating..." : "Publishing...") : (isEdit ? "Update Book" : "Publish Book")}
                         </button>
                     </div>
                 </form>

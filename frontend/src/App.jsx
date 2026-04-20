@@ -13,6 +13,7 @@ import Blog from './pages/Blog.jsx';
 import About from './pages/About.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Recommend from './pages/Recommend.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/products' element={<Products />} />
+        <Route path='/recommend' element={<Recommend />} />
         <Route path='/products/:id' element={<ProductDetails />} />
         <Route path='/blog' element={<Blog />} />
         <Route path='/contact' element={<Contact />} />
