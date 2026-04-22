@@ -9,7 +9,7 @@ const Products = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { books, loading } = useSelector((state) => state.books);
-  
+  console.log(books);
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get("search") || "";
 
@@ -38,7 +38,7 @@ const Products = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
 
         {products.map((item) => (
-          <div onClick={()=> navigate(`/products/${item._id}`)}
+          <div onClick={() => navigate(`/products/${item._id}`)}
             key={item._id}
             className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-105 duration-200"
           >
@@ -63,7 +63,10 @@ const Products = () => {
               )}
             </p>
 
-            <p className="font-bold text-[#0f8967]">${item.price}</p>
+            <div className="flex items-center gap-3">
+              <p className="font-bold text-[#0f8967]">${item.sellingPrice}</p>
+              <p className="font-bold line-through text-[#979797] text-xs">${item.actualPrice}</p>
+            </div>
 
           </div>
         ))}

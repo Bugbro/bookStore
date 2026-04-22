@@ -16,10 +16,12 @@ export const addToCart = async (req, res) => {
                 items: [{
                     bookId,
                     quantity,
-                    price: book.price,
+                    price: book.sellingPrice,
                 }],
-                totalPrice: book.price * quantity,
+                totalPrice: book.sellingPrice * quantity,
             });
+            await cart.save();
+            return resHandler(res, 200, "Book added to cart successfully", cart);
         } else {
             const itemIndex = cart.items.findIndex(item => item.bookId.toString() === bookId);
             if (itemIndex > -1) {
@@ -28,7 +30,7 @@ export const addToCart = async (req, res) => {
                 cart.items.push({
                     bookId,
                     quantity,
-                    price: book.price,
+                    price: book.sellingPrice,
                 });
             }
             cart.totalPrice = cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -81,7 +83,7 @@ export const syncCart = async (req, res) => {
                 cart.items.push({
                     bookId: incomingItem.bookId,
                     quantity: incomingItem.quantity,
-                    price: book.price,
+                    price: book.sellingPrice,
                 });
             }
         }

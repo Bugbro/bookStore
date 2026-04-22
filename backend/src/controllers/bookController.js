@@ -129,26 +129,79 @@ export const getBooksByCategory = async (req, res) => {
 };
 
 //for recommendation service from python model
+
 export const getPopularBooks = async (req, res) => {
     try {
         const response = await axios.get("http://localhost:8000/popular");
-        return resHandler(res, 200, "Books get successfully", response.data);
+
+        const titles = response.data.recommendations.map(
+            (b) => b["Book-Title"] || b.title
+        );
+
+        const books = await Book.find({
+            title: { $in: titles },
+            stock: { $gt: 0 }
+        });
+        if (!books || books.length === 0) {
+            return resHandler(res, 200, "Popular books not found");
+        }
+
+        return resHandler(res, 200, "Popular books fetched successfully", books);
+
     } catch (error) {
         console.log("Error while getting popular books", error.message);
         return resHandler(res, 500, error.message);
     }
-}
+};
 
 export const getRecommendationBooks = async (req, res) => {
     try {
         const { bookName } = req.params;
-        // need to think about like if not book found so how.? like we not sell that book
-        // const book = await Book.findOne({ title: bookName });
-        // if (!book) return resHandler(res, 404, "Book not found.");
-        const response = await axios.get(`http://localhost:8000/recommendations/${bookName}`);
-        return resHandler(res, 200, "Books get successfully", response.data.recommendations);
+
+        // Step 1: Call Python API
+        const response = await axios.get(
+            `http://localhost:8000/recommend/${encodeURIComponent(bookName)}`
+        );
+
+        const recs = response.data.recommendations;
+
+        // Step 2: Extract titles
+        const titles = recs.map((b) => b.title);
+
+        // Step 3: Fetch from DB
+        const dbBooks = await Book.find({
+            title: { $in: titles }
+        });
+
+        // Step 4: Create map for fast lookup
+        const dbMap = {};
+        dbBooks.forEach(book => {
+            dbMap[book.title] = book;
+        });
+
+        // Step 5: Merge results
+        const finalBooks = recs.map((rec) => {
+            const dbBook = dbMap[rec.title];
+
+            if (dbBook) {
+                return {
+                    ...dbBook.toObject(),
+                    inStock: dbBook.stock > 0
+                };
+            } else {
+                return {
+                    title: rec.title,
+                    author: rec.author,
+                    image: rec.image,
+                    inStock: false
+                };
+            }
+        });
+
+        return resHandler(res, 200, "Books fetched successfully", finalBooks);
+
     } catch (error) {
         console.log("Error while getting recommendation books", error.message);
         return resHandler(res, 500, error.message);
     }
-}
+};

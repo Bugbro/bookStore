@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../../api/axios.js"
 
 
 // Popular books
@@ -7,9 +7,10 @@ export const fetchPopularBooks = createAsyncThunk(
     "recommendation/fetchPopularBooks",
     async (_, thunkAPI) => {
         try {
-            const res = await axios.get("http://localhost:8000/popular");
+            const res = await api.get("/books/popular")
+            console.log(res);
 
-            return res.data.recommendations;
+            return res.data.data;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to fetch popular books");
         }
@@ -21,10 +22,9 @@ export const fetchRecommendations = createAsyncThunk(
     "recommendation/fetchRecommendations",
     async (bookName, thunkAPI) => {
         try {
-            const res = await axios.get(
-                `http://localhost:8000/recommend/${encodeURIComponent(bookName)}`
-            );
-            return res.data.recommendations;
+            const res = await api.post(`/books/recommendation/${encodeURIComponent(bookName)}`);
+            console.log(res)
+            return res.data.data;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to fetch recommendations");
         }

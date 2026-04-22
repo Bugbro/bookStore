@@ -13,12 +13,12 @@ const ProductDetails = () => {
   const [qty, setQty] = useState(1);
   const [mainImage, setMainImage] = useState("");
 
-  const handlerAddToCart = () =>{
+  const handlerAddToCart = () => {
     dispatch(
       addToCartThunk({
         _id: book._id,
         title: book.title,
-        price: book.price,
+        price: book.sellingPrice,
         image: book.images[0],
         quantity: qty
       })
@@ -33,10 +33,10 @@ const ProductDetails = () => {
   const book = books.data?.find((b) => b._id === id) || singleBook;
   console.log("product details");
   useEffect(() => {
-  if (book?.images?.length > 0) {
-    setMainImage(book.images[0]);
-  }
-}, [book]);
+    if (book?.images?.length > 0) {
+      setMainImage(book.images[0]);
+    }
+  }, [book]);
 
   useEffect(() => {
     if (!book) {
@@ -90,7 +90,10 @@ const ProductDetails = () => {
           </div>
           <p className="text-gray-500 text-sm ">{book?.description}</p>
           <p className="text-[#0f8967] text-xl font-semibold border-b border-gray-200 w-full pb-4">
-            Rs. {book?.price}
+            Rs. {book?.sellingPrice}
+          </p>
+          <p className="text-[#979797] text-xs line-through border-b border-gray-200 w-full pb-4">
+            Rs. {book?.actualPrice}
           </p>
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 gap-6">
@@ -105,7 +108,7 @@ const ProductDetails = () => {
               </button>
             </div>
             <button onClick={handlerAddToCart} className="flex items-center gap-2 bg-[#0f8967] text-white font-semibold px-6 py-2 rounded-full hover:bg-[#0d7255]">
-              <i className="fa-solid fa-cart-plus" ></i>  Add to cart 
+              <i className="fa-solid fa-cart-plus" ></i>  Add to cart
             </button>
           </div>
           <p>Categories: <span className="text-sm font-semibold capitalize">{book?.category}</span></p>
