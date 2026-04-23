@@ -210,7 +210,7 @@ const Navbar = () => {
             id=""
             className="pl-2 pr-20 py-2 hover:white font-semibold bg-[#17BD8D] outline-none"
           >
-            <option value="Category">Category</option>
+            <option value="Category">All </option>
             <option value="History">History </option>
             <option value="Fiction">Fiction</option>
             <option value="Science">Science</option>

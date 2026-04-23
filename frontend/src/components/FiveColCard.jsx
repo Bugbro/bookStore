@@ -2,59 +2,67 @@ import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { fetchBooks } from "../redux/features/book/bookSlice";
+import { fetchBooks } from "../redux/features/book/bookSlice.js";
 
 const FiveColCard = () => {
   const dispatch = useDispatch();
   const { books, loading } = useSelector((state) => state.books);
   const products = books.data?.slice(0, 4);
-  
-  useEffect(()=>{
-    if(!books){
+  console.log(books.data);
+
+
+  useEffect(() => {
+    if (!books) {
       dispatch(fetchBooks);
     }
-  },[])
+  }, [])
 
   if (loading) return <p>Loading...</p>;
   return (
     <div className="px-28 py-3 my-10">
       <div className="flex items-center justify-between ">
-        <h2 className="text-2xl font-bold">Our Favourite Reads</h2>
+        <h2 className="text-2xl font-bold">Our Top Picks</h2>
         <Link to="/products" className="">
           View All Products
         </Link>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mt-6 ">
         {products?.map((item, i) => (
-          <div
-            className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-103 duration-200"
-            key={i}
+          <Link
+            to={`/products/${item._id}`}
+            className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-105 duration-200 shadow-sm"
+            key={item._id || i}
           >
             <img
-              className="rounded-lg h-52"
-              src={item.images[0]}
+              className="rounded-lg h-52 object-cover w-full shadow-md"
+              src={item.images?.[0] || assets.dummyImg}
               alt={item.title}
             />
-            <p className="text-[#0f8967] text-xs">{item.author}</p>
-            <h2 className="font-bold line-clamp-1">{item.title}</h2>
-            <p className="text-sm">
+            <p className="text-[#0f8967] text-xs font-semibold uppercase tracking-wider">{item.author}</p>
+            <h2 className="font-bold text-gray-800 line-clamp-1">{item.title}</h2>
+            <div className="flex items-center gap-1 text-sm">
               {item.rating > 0 ? (
                 [...Array(item.rating)].map((_, i) => (
-                  <i key={i} className="fa-solid fa-star text-yellow-400"></i>
+                  <i key={i} className="fa-solid fa-star text-yellow-400 text-xs"></i>
                 ))
               ) : (
-                <span className="text-gray-400 italic">No rating yet</span>
+                <span className="text-gray-400 italic text-xs">No rating yet</span>
               )}
-            </p>
-            <p className="font-bold text-[#0f8967]">${item.price}</p>
-          </div>
+            </div>
+            <div className="flex items-center gap-2 mt-auto pt-2">
+              <p className="font-bold text-lg text-[#0f8967]">${item.sellingPrice}</p>
+              {item.actualPrice && item.actualPrice > item.sellingPrice && (
+                <p className="text-sm text-gray-500 line-through">${item.actualPrice}</p>
+              )}
+            </div>
+          </Link>
         ))}
 
         <div className=" col-span-2 lg:col-span-2 flex flex-col gap-2 p-4">
           <img
             className="rounded-lg w-full h-102"
             src={products?.[0]?.images?.[0] || assets.dummyImg}
-            
+
           />
         </div>
       </div>
