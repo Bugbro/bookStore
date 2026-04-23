@@ -159,12 +159,16 @@ export default function AddBook({ onClose, isEdit = false, initialData = null })
                             <label className={`text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Category <span className="text-rose-500">*</span></label>
                             <select name="category" value={formData.category} onChange={handleChange} required className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${darkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-gray-50 border-gray-200 text-gray-800"}`}>
                                 <option value="" disabled>Select a category</option>
+                                <option value="all">All </option>
+                                <option value="history">History </option>
                                 <option value="fiction">Fiction</option>
-                                <option value="non-fiction">Non-Fiction</option>
-                                <option value="self-help">Self-Help</option>
-                                <option value="business">Business</option>
-                                <option value="technology">Technology</option>
+                                <option value="non-fiction">Non Fiction</option>
+                                <option value="science">Science</option>
                                 <option value="biography">Biography</option>
+                                <option value="romantic">Romantic</option>
+                                <option value="horror">Horror</option>
+                                <option value="money">Money & Finance</option>
+                                <option value="travel">Travel</option>
                             </select>
                         </div>
                         {/* Description */}

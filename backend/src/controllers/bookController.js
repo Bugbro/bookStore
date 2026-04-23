@@ -120,7 +120,7 @@ export const getBooksByCategory = async (req, res) => {
     try {
         const category = req.params.category.toLowerCase();
         const books = await Book.find({ category });
-        if (!books || books.length === 0) return resHandler(res, 404, "Books not found for this category.");
+        if (!books || books.length === 0) return resHandler(res, 200, "Books not found for this category.");
         return resHandler(res, 200, "Books get successfully", books);
     } catch (error) {
         console.log("Error while getting books by category", error.message);

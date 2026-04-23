@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { assets } from "../assets/assets";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import CartPop from "./CartPop";
 import CheckoutModal from "./CheckoutModal";
 import LoginModal from "./LoginModal";
@@ -20,6 +20,9 @@ const Navbar = () => {
   const { books } = useSelector((state) => state.books);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const currentCategory = searchParams.get("category") || "all";
   const cartRef = useRef(null);
   const searchRef = useRef(null);
 
@@ -208,13 +211,27 @@ const Navbar = () => {
           <select
             name="category"
             id=""
+            value={currentCategory}
             className="pl-2 pr-20 py-2 hover:white font-semibold bg-[#17BD8D] outline-none"
+            onChange={(e) => {
+              const category = e.target.value;
+              if (category === "all") {
+                navigate("/products");
+              } else {
+                navigate(`/products?category=${category}`);
+              }
+            }}
           >
-            <option value="Category">All </option>
-            <option value="History">History </option>
-            <option value="Fiction">Fiction</option>
-            <option value="Science">Science</option>
-            <option value="Biography">Biography</option>
+            <option value="all">All </option>
+            <option value="history">History </option>
+            <option value="fiction">Fiction</option>
+            <option value="non-fiction">Non Fiction</option>
+            <option value="science">Science</option>
+            <option value="biography">Biography</option>
+            <option value="romantic">Romantic</option>
+            <option value="horror">Horror</option>
+            <option value="money">Money & Finance</option>
+            <option value="travel">Travel</option>
           </select>
         </div>
 
