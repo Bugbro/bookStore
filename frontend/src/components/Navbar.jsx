@@ -7,17 +7,22 @@ import LoginModal from "./LoginModal";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../redux/features/auth/authSlice";
 import { fetchBooks } from "../redux/features/book/bookSlice";
+import { getUserOrders } from "../redux/features/order/orderSlice";
 import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const [showCart, setShowCart] = useState(false);
+  const [showWishlistPop, setShowWishlistPop] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [activeMenu, setActiveMenu] = useState('main'); // 'main', 'orders', 'wishlist', 'track_order'
+  const [selectedTrackingOrder, setSelectedTrackingOrder] = useState(null);
   const cartItems = useSelector((state) => state.cart.cartItems);
   const { user } = useSelector((state) => state.auth);
   const { books } = useSelector((state) => state.books);
+  const { recentOrders, loading: orderLoading } = useSelector((state) => state.order);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,6 +30,7 @@ const Navbar = () => {
   const currentCategory = searchParams.get("category") || "all";
   const cartRef = useRef(null);
   const searchRef = useRef(null);
+  const wishlistRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -33,6 +39,9 @@ const Navbar = () => {
       }
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsSearchFocused(false);
+      }
+      if (wishlistRef.current && !wishlistRef.current.contains(event.target)) {
+        setShowWishlistPop(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -54,6 +63,16 @@ const Navbar = () => {
     } catch (error) {
       toast.error("Logout failed");
     }
+  };
+
+  const handleMyOrdersClick = (e) => {
+    e.stopPropagation();
+    setActiveMenu('orders');
+    if (!recentOrders || recentOrders.length === 0) {
+      dispatch(getUserOrders());
+    }
+    console.log(recentOrders);
+
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -142,7 +161,10 @@ const Navbar = () => {
             </a>
 
             {user ? (
-              <div className="relative group cursor-pointer">
+              <div
+                className="relative group cursor-pointer"
+                onMouseLeave={() => setActiveMenu('main')}
+              >
                 <div className="flex items-center gap-2 text-[#17BD8D]">
                   <div className="w-8 h-8 flex justify-center items-center rounded-full bg-[#17BD8D] text-white font-bold text-sm">
                     {user.name.charAt(0).toUpperCase()}
@@ -150,27 +172,199 @@ const Navbar = () => {
                   <span className="font-semibold text-sm hidden lg:block">{user.name.split(' ')[0]}</span>
                 </div>
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 top-8 pt-4 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                <div className={`absolute right-0 top-8 pt-4 w-80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50`}>
                   <div className="bg-white border border-gray-100 shadow-xl rounded-xl overflow-hidden">
-                    <div className="p-4 border-b border-gray-100 bg-gray-50 flex flex-col gap-1">
-                      <p className="font-bold text-gray-800 break-words">{user.name}</p>
-                      <p className="text-xs text-gray-500 break-words">{user.email}</p>
-                      {user.phone && <p className="text-xs text-gray-500">{user.phone}</p>}
-                    </div>
-                    <ul className="py-2 text-sm text-gray-700">
-                      <li className="px-4 py-2 hover:bg-gray-50 hover:text-[#17BD8D] flex items-center gap-3">
-                        <i className="fa-solid fa-bag-shopping w-4 text-center"></i> My Orders
-                      </li>
-                      <li className="px-4 py-2 hover:bg-gray-50 hover:text-[#17BD8D] flex items-center gap-3">
-                        <i className="fa-regular fa-heart w-4 text-center"></i> Wishlist
-                      </li>
-                      <li
-                        onClick={handleLogout}
-                        className="px-4 py-3 hover:bg-red-50 text-red-600 flex items-center gap-3 border-t border-gray-100 mt-1"
-                      >
-                        <i className="fa-solid fa-arrow-right-from-bracket w-4 text-center"></i> Logout
-                      </li>
-                    </ul>
+                    {activeMenu === 'orders' ? (
+                      <div className="p-4 flex flex-col h-full max-h-96">
+                        <div className="flex items-center gap-3 border-b border-gray-100 pb-3 mb-2">
+                          <button onClick={(e) => { e.stopPropagation(); setActiveMenu('main'); }} className="text-gray-500 hover:text-black transition-colors">
+                            <i className="fa-solid fa-arrow-left"></i>
+                          </button>
+                          <h2 className="text-lg font-semibold">Your Order</h2>
+                        </div>
+
+                        <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-2">
+                          {orderLoading ? (
+                            <p className="text-sm text-gray-500 text-center py-4">Loading orders...</p>
+                          ) : recentOrders && recentOrders.length > 0 ? (
+                            recentOrders.map((order) => (
+                              <div
+                                key={order._id}
+                                className="flex flex-col gap-2 border border-gray-200 p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition"
+                              >
+                                {/*  Top Row */}
+                                <div className="flex justify-between items-start gap-2">
+                                  <div className="flex-1">
+                                    <p className="text-xs text-gray-500 font-semibold mb-0.5">
+                                      Order #{order._id.slice(-6)}
+                                    </p>
+                                    <p className="text-sm font-bold text-gray-800 line-clamp-2 leading-tight" title={order.items?.[0]?.bookId?.title || "Book Item"}>
+                                      {order.items?.[0]?.bookId?.title || "Book Item"}
+                                    </p>
+                                  </div>
+
+                                  <div className="flex flex-col gap-1.5 items-end shrink-0">
+
+                                    {/*  Payment */}
+                                    <div className="flex items-center gap-2 text-xs font-medium w-[90px]">
+                                      <i className="fa-solid fa-wallet text-indigo-500 w-4 text-center"></i>
+                                      <span className="text-indigo-500 capitalize truncate flex-1" title={order.paymentMethod}>
+                                        {order.paymentMethod}
+                                      </span>
+                                    </div>
+
+
+                                    {/*  Status */}
+                                    <div className="flex items-center gap-2 text-xs font-medium w-[90px]">
+                                      {order.status === "delivered" ? (
+                                        <>
+                                          <i className="fa-solid fa-circle-check text-green-600 w-4 text-center"></i>
+                                          <span className="text-green-600 capitalize truncate flex-1" title={order.status}>
+                                            {order.status}
+                                          </span>
+                                        </>
+                                      ) : order.status === "pending" ? (
+                                        <>
+                                          <i className="fa-solid fa-clock text-orange-500 w-4 text-center"></i>
+                                          <span className="text-orange-500 capitalize truncate flex-1" title={order.status}>
+                                            {order.status}
+                                          </span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <i className="fa-solid fa-truck text-blue-500 w-4 text-center"></i>
+                                          <span className="text-blue-500 capitalize truncate flex-1" title={order.status}>
+                                            {order.status}
+                                          </span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+
+
+                                </div>
+
+
+
+                                {/*  Price + Date */}
+                                <div className="flex justify-between text-xs text-gray-500">
+                                  <span>Rs. {order.totalAmount}</span>
+                                  <span>
+                                    {new Date(order.createdAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+
+                                {/*  Items */}
+                                {order.items?.length > 0 && (
+                                  <div className="text-xs text-gray-600">
+                                    {order.items.length}{" "}
+                                    {order.items.length === 1 ? "item" : "items"}
+                                  </div>
+                                )}
+
+                                {/* Track Button */}
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedTrackingOrder(order);
+                                    setActiveMenu('track_order');
+                                  }}
+                                  className="mt-2 w-full bg-black text-white text-xs py-2 rounded-lg hover:bg-gray-800 transition"
+                                >
+                                  <i className="fa-solid fa-location-dot mr-1"></i>
+                                  Track Order
+                                </button>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-gray-500 text-center py-4">No orders found.</p>
+                          )}
+                        </div>
+                      </div>
+                    ) : activeMenu === 'track_order' && selectedTrackingOrder ? (
+                      <div className="p-4 flex flex-col h-full max-h-96">
+                        <div className="flex items-center gap-3 border-b border-gray-100 pb-3 mb-4">
+                          <button onClick={(e) => { e.stopPropagation(); setActiveMenu('orders'); }} className="text-gray-500 hover:text-black transition-colors">
+                            <i className="fa-solid fa-arrow-left"></i>
+                          </button>
+                          <h2 className="text-lg font-semibold">Track Order</h2>
+                        </div>
+                        
+                        <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-4">
+                          <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <p className="text-xs text-gray-500 font-semibold mb-1">Order #{selectedTrackingOrder._id.slice(-6)}</p>
+                            <p className="text-sm font-bold text-gray-800 line-clamp-1">{selectedTrackingOrder.items?.[0]?.bookId?.title || "Book Item"}</p>
+                          </div>
+
+                          {/* Stepper */}
+                          <div className="px-2">
+                            {["pending", "processing", "shipped", "delivered"].map((stage, index) => {
+                              const currentStageIndex = ["pending", "processing", "shipped", "delivered"].indexOf(selectedTrackingOrder.status);
+                              const isCompleted = index <= currentStageIndex;
+                              const isLast = index === 3;
+                              return (
+                                <div key={stage} className="flex gap-4">
+                                  <div className="flex flex-col items-center">
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] ${isCompleted ? 'bg-[#17BD8D] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                                      {isCompleted ? <i className="fa-solid fa-check"></i> : index + 1}
+                                    </div>
+                                    {!isLast && <div className={`w-0.5 h-8 ${index < currentStageIndex ? 'bg-[#17BD8D]' : 'bg-gray-200'}`}></div>}
+                                  </div>
+                                  <div className="pb-8 pt-0.5">
+                                    <p className={`text-sm font-semibold capitalize ${isCompleted ? 'text-gray-800' : 'text-gray-400'}`}>{stage}</p>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Address */}
+                          {selectedTrackingOrder.deliveryAddress && (
+                            <div className="border-t border-gray-100 pt-4 mt-2 mb-2">
+                              <h3 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">Delivery Details</h3>
+                              <div className="bg-white border border-gray-100 rounded-lg p-3 text-sm text-gray-700">
+                                <p className="font-bold text-gray-800 mb-1">{selectedTrackingOrder.deliveryAddress.name}</p>
+                                <p className="text-xs mb-0.5">{selectedTrackingOrder.deliveryAddress.street}</p>
+                                <p className="text-xs mb-0.5">{selectedTrackingOrder.deliveryAddress.city}, {selectedTrackingOrder.deliveryAddress.state} {selectedTrackingOrder.deliveryAddress.pincode}</p>
+                                <p className="text-xs mt-1 text-gray-500"><i className="fa-solid fa-phone mr-1"></i> {selectedTrackingOrder.deliveryAddress.phone}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : activeMenu === 'wishlist' ? (
+                      <div className="p-4 flex flex-col h-full max-h-96">
+                        <div className="flex items-center gap-3 border-b border-gray-100 pb-3 mb-2">
+                          <button onClick={(e) => { e.stopPropagation(); setActiveMenu('main'); }} className="text-gray-500 hover:text-black transition-colors">
+                            <i className="fa-solid fa-arrow-left"></i>
+                          </button>
+                          <h2 className="text-lg font-semibold">Your Wishlist</h2>
+                        </div>
+                        <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-2">
+                          <p className="text-sm text-gray-500 text-center py-4">Your wishlist is empty.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="p-4 border-b border-gray-100 bg-gray-50 flex flex-col gap-1">
+                          <p className="font-bold text-gray-800 break-words">{user.name}</p>
+                          <p className="text-xs text-gray-500 break-words">{user.email}</p>
+                          {user.phone && <p className="text-xs text-gray-500">{user.phone}</p>}
+                        </div>
+                        <ul className="py-2 text-sm text-gray-700">
+                          <li onClick={handleMyOrdersClick} className="px-4 py-2 hover:bg-gray-50 hover:text-[#17BD8D] flex items-center gap-3 cursor-pointer">
+                            <i className="fa-solid fa-bag-shopping w-4 text-center"></i> My Orders
+                          </li>
+
+                          <li
+                            onClick={(e) => { e.stopPropagation(); handleLogout(); }}
+                            className="px-4 py-3 hover:bg-red-50 text-red-600 flex items-center gap-3 border-t border-gray-100 mt-1 cursor-pointer"
+                          >
+                            <i className="fa-solid fa-arrow-right-from-bracket w-4 text-center"></i> Logout
+                          </li>
+                        </ul>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -180,8 +374,36 @@ const Navbar = () => {
               </div>
             )}
 
-            <div className="relative top-1 cursor-pointer hover:text-[#17BD8D] duration-150">
-              <i className="fa-regular fa-heart"></i>
+            <div className="relative" ref={wishlistRef}>
+              <div
+                onClick={() => {
+                  if (user) {
+                    setShowWishlistPop(!showWishlistPop);
+                  } else {
+                    setIsLoginModalOpen(true);
+                  }
+                }}
+                className="cursor-pointer hover:text-[#17BD8D] duration-150 relative top-1"
+              >
+                <i className="fa-regular fa-heart"></i>
+              </div>
+
+              {/* Wishlist Pop */}
+              {showWishlistPop && (
+                <div className="absolute right-0 top-10 w-80 bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden z-50">
+                  <div className="p-4 flex flex-col h-full max-h-96">
+                    <div className="flex items-center gap-3 border-b border-gray-100 pb-3 mb-2">
+                      <button onClick={(e) => { e.stopPropagation(); setShowWishlistPop(false); }} className="text-gray-500 hover:text-black transition-colors">
+                        <i className="fa-solid fa-arrow-left"></i>
+                      </button>
+                      <h2 className="text-lg font-semibold">Your Wishlist</h2>
+                    </div>
+                    <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-2">
+                      <p className="text-sm text-gray-500 text-center py-4">Your wishlist is empty.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="relative" ref={cartRef}>
               <i onClick={() => setShowCart(!showCart)} className="fa-solid fa-bag-shopping cursor-pointer"></i>

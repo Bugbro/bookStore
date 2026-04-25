@@ -5,7 +5,7 @@ import { authUser } from "../middleware/authMiddleware.js";
 const orderRouter = express.Router();
 
 orderRouter.post("/", authUser, placeOrder);
-orderRouter.get('/', authUser, getUserOrders);
+orderRouter.get('/user', authUser, getUserOrders);
 orderRouter.get('/:id', authUser, getOrderById);
 
 //admin

@@ -8,7 +8,7 @@ const FiveColCard = () => {
   const dispatch = useDispatch();
   const { books, loading } = useSelector((state) => state.books);
   const products = books.data?.slice(0, 4);
-  console.log(books.data);
+  // console.log(books.data);
 
 
   useEffect(() => {
