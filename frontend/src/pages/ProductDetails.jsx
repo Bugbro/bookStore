@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchBookById } from "../redux/features/book/bookSlice.js";
 import { addToCartThunk } from "../redux/features/cart/cartSlice.js";
+import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice.js";
 import RelatedProducts from "../components/relatedProducts.jsx";
 
 const ProductDetails = () => {
@@ -10,6 +11,7 @@ const ProductDetails = () => {
 
   const dispatch = useDispatch();
   const { books, singleBook, loading } = useSelector((state) => state.books);
+  const wishlistItems = useSelector((state) => state.wishlist?.items || []);
   const [qty, setQty] = useState(1);
   const [mainImage, setMainImage] = useState("");
 
@@ -48,14 +50,26 @@ const ProductDetails = () => {
   return (
     <div className="px-28 py-3 my-10">
       <h2>Products</h2>
-      <div className="flex items-start gap-6 my-4">
+      <div className="flex items-start gap-6 my-4 group">
         {/* image container */}
         <div className="flex flex-col gap-2 py-2 ">
-          <img
-            src={mainImage}
-            className=" w-80 h-96 border border-gray-200 px-2 rounded-md"
-            alt=""
-          />
+          <div className="relative">
+            <img
+              src={mainImage}
+              className=" w-80 h-96 border border-gray-200 px-2 rounded-md object-cover"
+              alt=""
+            />
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dispatch(toggleWishlist(book?._id));
+              }}
+              className="absolute top-2 right-2 bg-white/80 rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <i className={`fa-heart text-sm ${wishlistItems?.includes(book?._id) ? 'fa-solid text-red-500' : 'fa-regular text-gray-500'}`}></i>
+            </button>
+          </div>
           <div className="flex items-center gap-2 ">
             {book?.images.map((item, i) => (
               <img

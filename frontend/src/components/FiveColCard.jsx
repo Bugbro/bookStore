@@ -3,10 +3,12 @@ import { assets } from "../assets/assets";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchBooks } from "../redux/features/book/bookSlice.js";
+import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice.js";
 
 const FiveColCard = () => {
   const dispatch = useDispatch();
   const { books, loading } = useSelector((state) => state.books);
+  const wishlistItems = useSelector((state) => state.wishlist?.items || []);
   const products = books.data?.slice(0, 4);
   // console.log(books.data);
 
@@ -30,14 +32,26 @@ const FiveColCard = () => {
         {products?.map((item, i) => (
           <Link
             to={`/products/${item._id}`}
-            className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-105 duration-200 shadow-sm"
+            className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-105 duration-200 shadow-sm group"
             key={item._id || i}
           >
-            <img
-              className="rounded-lg h-52 object-cover w-full shadow-md"
-              src={item.images?.[0] || assets.dummyImg}
-              alt={item.title}
-            />
+            <div className="relative">
+              <img
+                className="rounded-lg h-52 object-cover w-full shadow-md"
+                src={item.images?.[0] || assets.dummyImg}
+                alt={item.title}
+              />
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  dispatch(toggleWishlist(item._id));
+                }}
+                className="absolute top-2 right-2 bg-white/80 rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <i className={`fa-heart text-sm ${wishlistItems?.includes(item._id) ? 'fa-solid text-red-500' : 'fa-regular text-gray-500'}`}></i>
+              </button>
+            </div>
             <p className="text-[#0f8967] text-xs font-semibold uppercase tracking-wider">{item.author}</p>
             <h2 className="font-bold text-gray-800 line-clamp-1">{item.title}</h2>
             <div className="flex items-center gap-1 text-sm">

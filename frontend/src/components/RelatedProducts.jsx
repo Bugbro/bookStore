@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchRelatedBooks } from "../redux/features/book/bookSlice.js";
+import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice.js";
 import { useNavigate } from "react-router-dom";
 
 const RelatedProducts = ({ bookCategory, bookId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const relatedBooks = useSelector((state) => state.books.relatedBooks);
+  const wishlistItems = useSelector((state) => state.wishlist?.items || []);
   const showRelatedBooks = relatedBooks.data?.filter(
     (item) => item._id !== bookId,
   );
@@ -34,14 +36,26 @@ const RelatedProducts = ({ bookCategory, bookId }) => {
           (
             <div onClick={() => navigate(`/products/${item._id}`)}
               key={item._id}
-              className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-105 duration-200"
+              className="flex flex-col gap-2 p-4 cursor-pointer hover:bg-gray-200 h-fit rounded-2xl hover:scale-105 duration-200 group"
             >
 
-              <img
-                className="rounded-lg aspect-3/4 w-full  object-cover"
-                src={item.images?.[0]}
-                alt={item.title}
-              />
+              <div className="relative">
+                <img
+                  className="rounded-lg aspect-3/4 w-full  object-cover"
+                  src={item.images?.[0]}
+                  alt={item.title}
+                />
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dispatch(toggleWishlist(item._id));
+                  }}
+                  className="absolute top-2 right-2 bg-white/80 rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <i className={`fa-heart text-sm ${wishlistItems?.includes(item._id) ? 'fa-solid text-red-500' : 'fa-regular text-gray-500'}`}></i>
+                </button>
+              </div>
 
               <p className="text-[#0f8967] text-xs">{item.author}</p>
 

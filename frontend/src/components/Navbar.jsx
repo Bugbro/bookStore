@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../redux/features/auth/authSlice";
 import { fetchBooks } from "../redux/features/book/bookSlice";
 import { getUserOrders } from "../redux/features/order/orderSlice";
+import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice";
 import { toast } from 'react-toastify';
 
 const Navbar = () => {
@@ -23,6 +24,7 @@ const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
   const { books } = useSelector((state) => state.books);
   const { recentOrders, loading: orderLoading } = useSelector((state) => state.order);
+  const wishlistItems = useSelector((state) => state.wishlist?.items || []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -76,6 +78,34 @@ const Navbar = () => {
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+  const wishlistContent = (
+    <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-2">
+      {wishlistItems.length > 0 ? (
+        wishlistItems.map((id) => {
+          const item = books?.data?.find(b => b._id === id);
+          if (!item) return null;
+          return (
+            <div key={id} className="flex items-center gap-3 border-b border-gray-100 pb-2 mb-2 group cursor-pointer" onClick={() => { setShowWishlistPop(false); navigate(`/products/${id}`); }}>
+              <img src={item.images?.[0] || assets.dummyImg} alt={item.title} className="w-12 h-16 object-cover rounded-md shadow-sm" />
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-gray-800 line-clamp-1 group-hover:text-[#17BD8D] transition-colors">{item.title}</h3>
+                <p className="text-sm font-bold text-[#17BD8D] mt-1">${item.sellingPrice}</p>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); dispatch(toggleWishlist(id)); }}
+                className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors flex items-center justify-center"
+              >
+                <i className="fa-solid fa-heart"></i>
+              </button>
+            </div>
+          );
+        })
+      ) : (
+        <p className="text-sm text-gray-500 text-center py-4">Your wishlist is empty.</p>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -263,7 +293,7 @@ const Navbar = () => {
                                 )}
 
                                 {/* Track Button */}
-                                <button 
+                                <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedTrackingOrder(order);
@@ -289,7 +319,7 @@ const Navbar = () => {
                           </button>
                           <h2 className="text-lg font-semibold">Track Order</h2>
                         </div>
-                        
+
                         <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-4">
                           <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
                             <p className="text-xs text-gray-500 font-semibold mb-1">Order #{selectedTrackingOrder._id.slice(-6)}</p>
@@ -340,9 +370,7 @@ const Navbar = () => {
                           </button>
                           <h2 className="text-lg font-semibold">Your Wishlist</h2>
                         </div>
-                        <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-2">
-                          <p className="text-sm text-gray-500 text-center py-4">Your wishlist is empty.</p>
-                        </div>
+                        {wishlistContent}
                       </div>
                     ) : (
                       <>
@@ -398,9 +426,7 @@ const Navbar = () => {
                       </button>
                       <h2 className="text-lg font-semibold">Your Wishlist</h2>
                     </div>
-                    <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-2">
-                      <p className="text-sm text-gray-500 text-center py-4">Your wishlist is empty.</p>
-                    </div>
+                    {wishlistContent}
                   </div>
                 </div>
               )}

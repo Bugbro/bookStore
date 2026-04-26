@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { assets } from "../assets/assets.js";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBooks } from "../redux/features/book/bookSlice.js";
+import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice.js";
 
 const OurFavCards = () => {
   const dispatch = useDispatch();
   const { books, loading } = useSelector((state) => state.books);
+  const wishlistItems = useSelector((state) => state.wishlist?.items || []);
 
   useEffect(() => {
     // If books data is not available, fetch it
@@ -35,13 +37,25 @@ const OurFavCards = () => {
       <Link
         key={item._id}
         to={`/products/${item._id}`}
-        className={`${colIndex} ${rowClasses[rowIndex]} border-b border-gray-300 flex items-start gap-4 py-2 cursor-pointer hover:bg-gray-100 duration-350 transition-all px-2 rounded-md`}
+        className={`${colIndex} ${rowClasses[rowIndex]} border-b border-gray-300 flex items-start gap-4 py-2 cursor-pointer hover:bg-gray-100 duration-350 transition-all px-2 rounded-md group`}
       >
-        <img
-          className="h-24 w-16 object-cover rounded-md shadow-sm"
-          src={item.images?.[0] || assets.dummyImg}
-          alt={item.title}
-        />
+        <div className="relative shrink-0">
+          <img
+            className="h-24 w-16 object-cover rounded-md shadow-sm"
+            src={item.images?.[0] || assets.dummyImg}
+            alt={item.title}
+          />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              dispatch(toggleWishlist(item._id));
+            }}
+            className="absolute top-1 right-1 bg-white/80 rounded-full w-5 h-5 flex items-center justify-center shadow-sm hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <i className={`fa-heart text-[10px] ${wishlistItems?.includes(item._id) ? 'fa-solid text-red-500' : 'fa-regular text-gray-500'}`}></i>
+          </button>
+        </div>
         <div className="flex gap-1 flex-col w-full">
           <p className="text-[#0f8967] text-xs font-semibold uppercase tracking-wider">{item.author}</p>
           <h3 className="text-sm font-bold text-gray-800 line-clamp-1">{item.title}</h3>
@@ -71,13 +85,25 @@ const OurFavCards = () => {
       <Link
         key={item._id}
         to={`/products/${item._id}`}
-        className={`${colIndex} row-span-4 border-l border-gray-300 px-4 h-full cursor-pointer hover:bg-gray-100 duration-350 transition-all rounded-md flex justify-evenly flex-col`}
+        className={`${colIndex} row-span-4 border-l border-gray-300 px-4 h-full cursor-pointer hover:bg-gray-100 duration-350 transition-all rounded-md flex justify-evenly flex-col group`}
       >
-        <img
-          className="h-fit max-h-80 w-full object-cover rounded-md shadow-md"
-          src={item.images?.[0] || assets.dummyImg}
-          alt={item.title}
-        />
+        <div className="relative">
+          <img
+            className="h-fit max-h-80 w-full object-cover rounded-md shadow-md"
+            src={item.images?.[0] || assets.dummyImg}
+            alt={item.title}
+          />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              dispatch(toggleWishlist(item._id));
+            }}
+            className="absolute top-2 right-2 bg-white/80 rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <i className={`fa-heart text-sm ${wishlistItems?.includes(item._id) ? 'fa-solid text-red-500' : 'fa-regular text-gray-500'}`}></i>
+          </button>
+        </div>
         <div className="flex gap-2 flex-col mt-4">
           <p className="text-[#0f8967] text-xs font-semibold uppercase tracking-wider">{item.author}</p>
           <h3 className="text-lg font-bold text-gray-800 line-clamp-2">{item.title}</h3>
