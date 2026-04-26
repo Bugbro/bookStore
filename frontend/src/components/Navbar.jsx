@@ -13,6 +13,8 @@ import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const [showCart, setShowCart] = useState(false);
+  const [showLocationPop, setShowLocationPop] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState("Find a book store");
   const [showWishlistPop, setShowWishlistPop] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -33,6 +35,7 @@ const Navbar = () => {
   const cartRef = useRef(null);
   const searchRef = useRef(null);
   const wishlistRef = useRef(null);
+  const locationRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -44,6 +47,9 @@ const Navbar = () => {
       }
       if (wishlistRef.current && !wishlistRef.current.contains(event.target)) {
         setShowWishlistPop(false);
+      }
+      if (locationRef.current && !locationRef.current.contains(event.target)) {
+        setShowLocationPop(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -180,15 +186,48 @@ const Navbar = () => {
             )}
           </div>
           <div className="flex gap-4 text-xl">
-            <a
-              href="#"
-              className="flex gap-2 items-center  hover:text-[#17BD8D] duration-150"
-            >
-              <i className="fas fa-location"></i>
-              <span className="border-b font-semibold text-sm">
-                Find a book store
-              </span>
-            </a>
+            <div className="relative flex items-center" ref={locationRef}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowLocationPop(!showLocationPop);
+                }}
+                className="flex gap-2 items-center hover:text-[#17BD8D] duration-150"
+              >
+                <i className="fas fa-location"></i>
+                <span className="border-b font-semibold text-sm whitespace-nowrap">
+                  {selectedLocation}
+                </span>
+              </a>
+
+              {/* Location Popup */}
+              {showLocationPop && (
+                <div className="absolute top-[130%] -left-4 w-56 bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden z-50">
+                  <div className="flex flex-col">
+                    <div className="px-4 py-3 border-b border-gray-100 font-semibold text-sm text-gray-700 bg-gray-50 flex justify-between items-center">
+                      <span>Select Location</span>
+                      <button onClick={() => setShowLocationPop(false)} className="text-gray-400 hover:text-gray-600">
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </div>
+                    {["Delhi", "Mohali", "Solan"].map((loc, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSelectedLocation(loc);
+                          setShowLocationPop(false);
+                        }}
+                        className="px-4 py-3 text-sm text-left hover:bg-green-50 hover:text-[#17BD8D] transition-colors border-b border-gray-50 last:border-0 flex items-center group"
+                      >
+                        <i className="fas fa-map-marker-alt w-5 text-center mr-2 text-gray-400 group-hover:text-[#17BD8D] transition-colors"></i>
+                        <span className="text-gray-700 group-hover:text-[#17BD8D] font-medium">{loc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {user ? (
               <div
