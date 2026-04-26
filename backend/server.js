@@ -10,6 +10,7 @@ import cartRouter from "./src/routes/cartRoutes.js";
 import bookRouter from "./src/routes/bookRoutes.js";
 import orderRouter from "./src/routes/orderRoutes.js";
 import newsLetterRouter from "./src/routes/newsLetterRoutes.js";
+import contactRouter from "./src/routes/contactRoutes.js";
 import connectCloudinary from "./src/config/cloudinary.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -50,6 +51,7 @@ app.use("/api/cart", cartRouter);
 app.use("/api/books", bookRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/newsletter", newsLetterRouter);
+app.use("/api/contact", contactRouter);
 
 //setup socket io
 const io = new Server(server, {
