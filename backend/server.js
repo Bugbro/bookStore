@@ -15,6 +15,7 @@ import connectCloudinary from "./src/config/cloudinary.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { initSocket } from "./src/sockets/socketManager.js";
+import { contactLimiter } from "./src/middleware/rateLimiter.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -51,7 +52,7 @@ app.use("/api/cart", cartRouter);
 app.use("/api/books", bookRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/newsletter", newsLetterRouter);
-app.use("/api/contact", contactRouter);
+app.use("/api/contact", contactLimiter, contactRouter);
 
 //setup socket io
 const io = new Server(server, {

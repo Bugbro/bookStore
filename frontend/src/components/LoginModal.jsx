@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { assets } from '../assets/assets';
-import { loginAPI, registerAPI } from '../api/authAPI/authAPI.js';
+import { loginAPI, registerAPI, googleLoginAPI } from '../api/authAPI/authAPI.js';
 import { syncCartAPI } from '../api/cartAPI/cartAPI.js';
+import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials } from '../redux/features/auth/authSlice';
@@ -23,6 +24,26 @@ const LoginModal = ({ isOpen, onClose }) => {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await googleLoginAPI({ credential: credentialResponse.credential });
+      toast.success(res.data.message || 'Google Login successful!');
+      dispatch(setCredentials(res.data.user));
+      if (cartItems.length > 0) {
+        try {
+          await syncCartAPI(cartItems);
+          dispatch(clearCart());
+        } catch (err) {
+          console.error("Cart sync failed:", err);
+        }
+      }
+      await dispatch(fetchUserCart());
+      onClose();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Google login failed. Please try again.');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -179,6 +200,18 @@ const LoginModal = ({ isOpen, onClose }) => {
               {isLogin ? "Sign In" : "Sign Up"}
             </button>
           </form>
+
+          <div className="my-6 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-gray-300 after:mt-0.5 after:flex-1 after:border-t after:border-gray-300">
+            <p className="mx-4 mb-0 text-center font-semibold text-gray-500">OR</p>
+          </div>
+          
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error('Google login failed.')}
+              useOneTap
+            />
+          </div>
 
           <p className="mt-8 text-center text-gray-600">
             {isLogin ? "Don't have an account? " : "Already have an account? "}

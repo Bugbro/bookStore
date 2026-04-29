@@ -4,6 +4,9 @@ import { genJWTandSetCookies } from "../utils/genJWTandSetCookies.js";
 import { compareHash, hashValue } from "../utils/hash.js";
 import { resHandler } from "../utils/resHandler.js";
 import { sendMail } from "../utils/sendMail.js";
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const registerUser = async (req, res) => {
     try {
@@ -188,3 +191,47 @@ export const getCurrentUser = async (req, res) => {
         return resHandler(res, 500, error.message);
     }
 }
+
+export const googleLogin = async (req, res) => {
+    try {
+        const { credential } = req.body;
+        if (!credential) return resHandler(res, 400, "Google credential is required");
+
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const { sub: googleId, email, name, picture } = payload;
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            user = await User.create({
+                name,
+                email,
+                googleId,
+                avatar: picture,
+            });
+        } else if (!user.googleId) {
+            user.googleId = googleId;
+            if (!user.avatar) user.avatar = picture;
+            await user.save();
+        }
+
+        genJWTandSetCookies(res, user._id, user.role);
+
+        return resHandler(res, 200, "User logged in successfully with Google", {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone || "",
+            avatar: user.avatar
+        }, "user");
+    } catch (error) {
+        console.log("Error in google login", error.message);
+        return resHandler(res, 500, error.message);
+    }
+};
