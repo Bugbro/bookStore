@@ -21,7 +21,7 @@ const Footer = () => {
   }
 
   return (
-    <div className="px-28  py-10 flex flex-col items-center bg-black text-white">
+    <div className="px-4 md:px-12 lg:px-28  py-10 flex flex-col items-center bg-black text-white">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="order-1 flex flex-col items-start gap-2 pr-8">
           <img className="w-50 " src={assets.logo} alt="logo" />

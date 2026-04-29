@@ -10,19 +10,19 @@ import ServiceBar from "../components/ServiceBar.jsx";
 const Home = () => {
 
   const dispatch = useDispatch();
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(fetchBooks());
-  },[dispatch]);
+  }, [dispatch]);
 
   return (
     <div className="">
       <div
-        className="px-28 py-3 flex items-center justify-evenly bg-center bg-cover bg-no-repeat h-[50vh] w-full"
+        className="px-4 md:px-12 lg:px-28 py-3 flex items-center justify-center lg:justify-evenly bg-center bg-cover bg-no-repeat h-[50vh] w-full"
         style={{ backgroundImage: `url(${assets.mainBg})` }}
       >
         <div className="text-white flex flex-col gap-6 w-1/2">
           <p className="text-sm ">SPECIAL OFFER</p>
-          <h2 className="text-6xl font-bold ">
+          <h2 className="text-3xl lg:text-6xl font-bold ">
             Discover Stories That Stay With You
           </h2>
           <p>Check out the stories that will stay with you forever.</p>
@@ -37,13 +37,13 @@ const Home = () => {
           <img className="h-full" src={assets.mainBooks} alt="Main Books" />
         </div>
       </div>
-      <div className="flex items-center  gap-4 px-28 py-3 h-80 my-10">
+      <div className="flex items-center  gap-4 px-4 md:px-12 lg:px-28 py-3 h-80 my-10">
         <Card subHead="Summer Sale" title="Sale 25% OFF" button="Shop Now" textBg="text-white" bgImage={assets.cardAlchemist} bgGradient="#2173b2]" />
         <Card subHead="Novel Everyday" title="Sale 45% OFF" button="Shop Now" textBg="text-black" bgImage={assets.cardIkigia} />
       </div>
-      <OurFavCards/>
-      <FiveColCard/>
-      <ServiceBar/>
+      <OurFavCards />
+      <FiveColCard />
+      <ServiceBar />
     </div>
   );
 };

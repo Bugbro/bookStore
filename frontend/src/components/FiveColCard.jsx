@@ -21,7 +21,7 @@ const FiveColCard = () => {
 
   if (loading) return <p>Loading...</p>;
   return (
-    <div className="px-28 py-3 my-10">
+    <div className="px-4 md:px-12 lg:px-28 py-3 my-10">
       <div className="flex items-center justify-between ">
         <h2 className="text-2xl font-bold">Our Top Picks</h2>
         <Link to="/products" className="">

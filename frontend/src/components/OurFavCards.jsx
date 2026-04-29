@@ -128,7 +128,7 @@ const OurFavCards = () => {
   };
 
   return (
-    <div className="flex flex-col px-28 py-3 my-10 gap-6">
+    <div className="flex flex-col px-4 md:px-12 lg:px-28 py-3 my-10 gap-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Our Favourite Reads</h2>
         <Link to="/products" className="">
@@ -136,18 +136,18 @@ const OurFavCards = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-4 grid-rows-4 gap-4 h-150 border border-gray-300 px-6 py-4 rounded-2xl">
+      <div className="grid grid-cols-2 lg:grid-cols-4 grid-rows-4 gap-4 h-auto lg:h-150 border border-gray-300 px-2 md:px-6 py-4 rounded-2xl">
         {/* Column 1 */}
         {col1Books.map((item, i) => renderSmallItem(item, "col-start-1", i))}
 
         {/* Column 2 Full */}
-        {renderLargeItem(col2Book, "col-start-2")}
+        {renderLargeItem(col2Book, "hidden lg:flex lg:col-start-2")}
 
         {/* Column 3 */}
-        {col3Books.map((item, i) => renderSmallItem(item, "col-start-3", i))}
+        {col3Books.map((item, i) => renderSmallItem(item, "col-start-2 lg:col-start-3", i))}
 
         {/* Column 4 Full */}
-        {renderLargeItem(col4Book, "col-start-4")}
+        {renderLargeItem(col4Book, "hidden lg:flex lg:col-start-4")}
       </div>
     </div>
   );

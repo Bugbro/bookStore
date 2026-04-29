@@ -18,6 +18,7 @@ const Navbar = () => {
   const [showWishlistPop, setShowWishlistPop] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeMenu, setActiveMenu] = useState('main'); // 'main', 'orders', 'wishlist', 'track_order'
@@ -116,7 +117,7 @@ const Navbar = () => {
   return (
     <>
       {/* top line */}
-      <div className="px-28 py-3 bg-black text-white flex justify-between items-center w-full text-sm">
+      <div className="px-4 md:px-12 lg:px-28 py-3 bg-black text-white flex justify-between items-center w-full text-sm">
         <div className="flex items-center justify-between gap-6 ">
           <p>
             <i className="fa-solid fa-phone-volume"></i> +91 9816496136
@@ -134,7 +135,7 @@ const Navbar = () => {
       </div>
 
       {/* middle bar */}
-      <div className="px-28 py-3 bg-white text-black flex justify-between items-center w-full border-b-[#17BD8D]/40 border-b">
+      <div className="px-4 md:px-8 lg:px-28 py-3 bg-white text-black flex justify-between items-center w-full border-b-[#17BD8D]/40 border-b">
         <div className="w-40">
           <img src={assets.logo} alt="logo" />
         </div>
@@ -492,14 +493,14 @@ const Navbar = () => {
       </div>
 
       {/* below bar */}
-      <div className="px-28 py-3 flex items-center justify-between ">
-        <div className="bg-[#17BD8D] text-white px-4 py-1 rounded-full">
+      <div className="px-4 md:px-8 lg:px-28 py-3 flex items-center justify-between gap-4">
+        <div className="bg-[#17BD8D] text-white px-4 py-1 rounded-full flex items-center w-full sm:w-[50%] md:w-[30%] lg:w-auto xl:w-[300px]">
           <i className="fa-solid fa-list-ul"></i>
           <select
             name="category"
             id=""
             value={currentCategory}
-            className="pl-2 pr-20 py-2 hover:white font-semibold bg-[#17BD8D] outline-none"
+            className="w-full pl-2 pr-2 lg:pr-4 py-2 hover:white font-semibold bg-[#17BD8D] outline-none"
             onChange={(e) => {
               const category = e.target.value;
               if (category === "all") {
@@ -522,8 +523,15 @@ const Navbar = () => {
           </select>
         </div>
 
-        {/* links */}
-        <div className="flex gap-6 text-sm font-bold text-[#0f8967]">
+        {/* Burger menu for mobile */}
+        <div className="md:hidden flex items-center shrink-0">
+          <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="text-[#0f8967] text-2xl focus:outline-none">
+            <i className={`fa-solid ${showMobileMenu ? 'fa-xmark' : 'fa-bars'}`}></i>
+          </button>
+        </div>
+
+        {/* links (desktop/tablet) */}
+        <div className="hidden md:flex gap-4 lg:gap-6 text-sm font-bold text-[#0f8967]">
           <Link to="/">Home</Link>
           <Link to="/products">Products</Link>
           <Link to="/recommend">Recommend</Link>
@@ -532,7 +540,7 @@ const Navbar = () => {
           <Link to="/about">About Us</Link>
         </div>
 
-        <div className="flex items-center gap-4 ">
+        <div className="lg:flex items-center gap-4 hidden ">
           <div className="text-[#17BD8D] bg-[#efefef] flex items-center p-3 rounded-full">
             <i className="fa-solid fa-phone-volume "></i>
           </div>
@@ -544,6 +552,18 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {showMobileMenu && (
+        <div className="md:hidden px-4 py-4 bg-white border-t flex flex-col gap-4 text-sm font-bold text-[#0f8967]">
+          <Link to="/" onClick={() => setShowMobileMenu(false)}>Home</Link>
+          <Link to="/products" onClick={() => setShowMobileMenu(false)}>Products</Link>
+          <Link to="/recommend" onClick={() => setShowMobileMenu(false)}>Recommend</Link>
+          <Link to="/blog" onClick={() => setShowMobileMenu(false)}>Blog</Link>
+          <Link to="/contact" onClick={() => setShowMobileMenu(false)}>Contact</Link>
+          <Link to="/about" onClick={() => setShowMobileMenu(false)}>About Us</Link>
+        </div>
+      )}
 
       <CheckoutModal
         isOpen={isCheckoutOpen}
