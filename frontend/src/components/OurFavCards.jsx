@@ -71,7 +71,7 @@ const OurFavCards = () => {
           <div className="flex items-center gap-2 mt-auto">
             <p className="font-bold text-sm text-[#0f8967]">${item.sellingPrice}</p>
             {item.actualPrice && item.actualPrice > item.sellingPrice && (
-              <p className="text-xs text-gray-500 line-through">${item.actualPrice}</p>
+              <p className="text-[10px] md:text-xs text-gray-500 line-through">${item.actualPrice}</p>
             )}
           </div>
         </div>
@@ -130,8 +130,8 @@ const OurFavCards = () => {
   return (
     <div className="flex flex-col px-4 md:px-12 lg:px-28 py-3 my-10 gap-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Our Favourite Reads</h2>
-        <Link to="/products" className="">
+        <h2 className="text-xl md:text-2xl font-bold">Our Favourite Reads</h2>
+        <Link to="/products" className="text-sm">
           View All Products
         </Link>
       </div>

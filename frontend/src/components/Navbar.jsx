@@ -118,15 +118,15 @@ const Navbar = () => {
     <>
       {/* top line */}
       <div className="px-4 md:px-12 lg:px-28 py-3 bg-black text-white flex justify-between items-center w-full text-sm">
-        <div className="flex items-center justify-between gap-6 ">
-          <p>
+        <div className="flex items-center justify-between gap-2 md:gap-6  ">
+          <p className="text-[10px] md:text-sm">
             <i className="fa-solid fa-phone-volume"></i> +91 9816496136
           </p>
-          <p>
+          <p className="text-[10px] md:text-sm">
             <i className="fa-solid fa-envelope"></i> bookstore@gmail.com
           </p>
         </div>
-        <div className="flex items-center justify-between gap-6 ">
+        <div className="flex items-center justify-between gap-2 md:gap-6 text-[10px] md:text-sm ">
           <i className="fa-brands fa-meta"></i>
           <i className="fa-brands fa-instagram"></i>
           <i className="fa-brands fa-youtube"></i>
@@ -139,12 +139,12 @@ const Navbar = () => {
         <div className="w-40">
           <img src={assets.logo} alt="logo" />
         </div>
-        <div className="flex flex-1 items-center justify-end gap-6 ">
+        <div className="flex flex-1 items-center justify-between md:justify-end  md:gap-6 ">
           {/* search fild */}
-          <div className="w-1/2 relative group z-50" ref={searchRef}>
-            <div className="bg-gray-100 pl-5 pr-1.5 py-1.5 rounded-full w-full flex items-center justify-between border border-transparent focus-within:border-[#17BD8D]/30 focus-within:bg-white focus-within:shadow-sm transition-all duration-300">
+          <div className="w-[80%] md:w-1/2 relative group z-50" ref={searchRef}>
+            <div className="bg-gray-100 px-1 md:px-5 md:pr-1.5 py-1.5 rounded-full w-full flex items-center justify-between border border-transparent focus-within:border-[#17BD8D]/30 focus-within:bg-white focus-within:shadow-sm transition-all duration-300">
               <input
-                className="w-full outline-none font-medium px-2 py-2 bg-transparent text-gray-700 placeholder-gray-400"
+                className="w-full outline-none font-medium px-2 py-0 md:py-2 bg-transparent text-gray-700 placeholder-gray-400"
                 type="text"
                 placeholder="Search Products..."
                 value={searchTerm}
@@ -159,7 +159,7 @@ const Navbar = () => {
               />
               <button
                 onClick={() => { setIsSearchFocused(false); navigate(searchTerm ? `/products?search=${searchTerm}` : "/products"); }}
-                className="bg-[#17BD8D] text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#15ae83] hover:shadow-md transition-all duration-200 shrink-0 group-hover:scale-105"
+                className="bg-[#17BD8D] text-white w-8 h-8 md:w-10  md:h-10 flex items-center justify-center rounded-full hover:bg-[#15ae83] hover:shadow-md transition-all duration-200 shrink-0 group-hover:scale-105"
               >
                 <i className="fas fa-search text-sm"></i>
               </button>
@@ -186,8 +186,8 @@ const Navbar = () => {
               </div>
             )}
           </div>
-          <div className="flex gap-4 text-xl">
-            <div className="relative flex items-center" ref={locationRef}>
+          <div className="flex gap-2 md:gap-4 text-xl">
+            <div className="relative md:flex items-center hidden " ref={locationRef}>
               <a
                 href="#"
                 onClick={(e) => {
@@ -442,7 +442,7 @@ const Navbar = () => {
               </div>
             )}
 
-            <div className="relative" ref={wishlistRef}>
+            <div className="relative hidden md:block " ref={wishlistRef}>
               <div
                 onClick={() => {
                   if (user) {

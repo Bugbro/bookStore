@@ -43,9 +43,9 @@ const ContactForm = () => {
 
 
     return (
-        <div className=" flex flex-row gap-2 mb-8 border border-[#17BD8D]/20 rounded-xl px-[112px] py-16">
+        <div className=" flex flex-col md:flex-row gap-2 mb-8 border border-[#17BD8D]/20 rounded-xl px-2 md:px-[112px] py-16">
             {/* form section */}
-            <div className="w-1/2 p-4">
+            <div className="w-full md:w-1/2 p-4">
                 <h1 className="text-xl font-semibold">Have Questions? We're just a Message awau.!</h1>
                 <p className="text-base">Fill out the form below, and one of our team member will get bact to you shortly.</p>
                 <form className="flex flex-col gap-1 " onSubmit={handleSubmit}>
@@ -62,7 +62,7 @@ const ContactForm = () => {
             </div>
 
             {/* rigth side image */}
-            <div className="w-1/2 p-4">
+            <div className="w-full md:w-1/2 p-4">
                 <img src={assets.contact} alt="Contact Us" className="rounded-xl" />
                 <div className="flex gap-2 items-center my-4">
                     <div className="flex items-start gap-2 mr-4 border border-gray-200 px-4 py-2 rounded-md">

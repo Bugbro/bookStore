@@ -2,7 +2,7 @@ import { assets } from "../assets/assets";
 
 const BlogCard = () => {
     return (
-        <div className="my-16">
+        <div className="my-4 md:my-16">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-4 shadow rounded">
                     <img className="h-[250px] w-full rounded" src={assets.dummyImg} alt="Blog Image" />

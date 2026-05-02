@@ -4,10 +4,10 @@ import { assets } from "../assets/assets";
 const About = () => {
   return (
     <div>
-      <div className="flex justify-between items-center main-padding">
+      {/* <div className="flex justify-between items-center main-padding">
         <h1>About Us</h1>
         <p>Find out who we are!</p>
-      </div>
+      </div> */}
       <div className="relative h-30 w-225 bg-white overflow-visible text-center mx-auto">
         <img
           src={assets.aboutUs}

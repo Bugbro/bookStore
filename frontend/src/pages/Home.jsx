@@ -17,12 +17,12 @@ const Home = () => {
   return (
     <div className="">
       <div
-        className="px-4 md:px-12 lg:px-28 py-3 flex items-center justify-center lg:justify-evenly bg-center bg-cover bg-no-repeat h-[50vh] w-full"
+        className="pl-4 md:px-12 lg:px-28 py-3 flex items-center justify-center lg:justify-evenly bg-center bg-cover bg-no-repeat h-[40vh] md:h-[50vh] w-full"
         style={{ backgroundImage: `url(${assets.mainBg})` }}
       >
-        <div className="text-white flex flex-col gap-6 w-1/2">
+        <div className="text-white flex flex-col gap-4 md:gap-6 w-1/2">
           <p className="text-sm ">SPECIAL OFFER</p>
-          <h2 className="text-3xl lg:text-6xl font-bold ">
+          <h2 className="text-xl md:text-3xl lg:text-6xl font-bold ">
             Discover Stories That Stay With You
           </h2>
           <p>Check out the stories that will stay with you forever.</p>
@@ -33,7 +33,7 @@ const Home = () => {
             <span>Shop Now</span> <i className="fa-solid fa-angle-right"></i>
           </a>
         </div>
-        <div className="h-full">
+        <div className="h-[183px] md:h-full">
           <img className="h-full" src={assets.mainBooks} alt="Main Books" />
         </div>
       </div>
