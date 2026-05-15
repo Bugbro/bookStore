@@ -26,7 +26,7 @@ const server = http.createServer(app);
 
 //cors setup for admin and frontend
 const allowedOrigins = [
-  "https://bookstore-8rv1.onrender.com",
+  "https://book-store-puce-seven.vercel.app/",
   "http://localhost:5173",
   "http://localhost:5174",
 ];
