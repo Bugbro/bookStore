@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBooks, fetchRelatedBooks } from "../redux/features/book/bookSlice";
 import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice.js";
@@ -16,15 +16,23 @@ const Products = () => {
   const searchQuery = searchParams.get("search") || "";
   const categoryQuery = searchParams.get("category") || "";
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, categoryQuery]);
+
   useEffect(() => {
     if (categoryQuery) {
       dispatch(fetchRelatedBooks(categoryQuery));
     } else {
-      dispatch(fetchBooks(searchQuery));
+      dispatch(fetchBooks({ searchQuery, page: currentPage, limit: 10 }));
     }
-  }, [dispatch, searchQuery, categoryQuery]);
+  }, [dispatch, searchQuery, categoryQuery, currentPage]);
 
-  const products = categoryQuery ? (relatedBooks?.data || []) : (books?.data || []);
+  const products = categoryQuery ? (relatedBooks?.data || []) : (books?.data?.books || []);
+  const totalPages = !categoryQuery ? (books?.data?.totalPages || 1) : 1;
+  const currentPageNum = !categoryQuery ? (books?.data?.currentPage || 1) : 1;
   const isLoading = categoryQuery ? relatedBookLoading : loading === "loading";
 
   if (isLoading)
@@ -92,6 +100,39 @@ const Products = () => {
         )}
 
       </div>
+
+      {/* Pagination Controls */}
+      {!categoryQuery && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 mt-10">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPageNum === 1}
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${currentPageNum === 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0f8967] text-white hover:bg-[#0d7255]'}`}
+          >
+            Previous
+          </button>
+          
+          <div className="flex gap-2">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`w-10 h-10 rounded-lg font-semibold transition-colors ${currentPageNum === i + 1 ? 'bg-[#0f8967] text-white shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPageNum === totalPages}
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${currentPageNum === totalPages ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0f8967] text-white hover:bg-[#0d7255]'}`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

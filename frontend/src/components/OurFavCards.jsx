@@ -20,7 +20,7 @@ const OurFavCards = () => {
   if (loading) return <p>Loading...</p>;
 
   // Sort books by rating (descending), top rating first.
-  const displayBooks = [...(books?.data || [])]
+  const displayBooks = [...(books?.data?.books || [])]
     .sort((a, b) => (b.rating || 0) - (a.rating || 0))
     .slice(0, 10);
 

@@ -5,6 +5,7 @@ import { compareHash, hashValue } from "../utils/hash.js";
 import { resHandler } from "../utils/resHandler.js";
 import { sendMail } from "../utils/sendMail.js";
 import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -176,19 +177,30 @@ export const logoutUser = async (req, res) => {
 
 export const getCurrentUser = async (req, res) => {
     try {
-        const userId = req.body.userId; // Provided by authMiddleware
-        const user = await User.findById(userId).select('-password');
-        if (!user) return resHandler(res, 404, "User not found");
+        const token = req.cookies.token;
+        if (!token) {
+            return resHandler(res, 200, "Not authenticated", null, "user");
+        }
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!decoded || !decoded.userId) {
+            return resHandler(res, 200, "Not authenticated", null, "user");
+        }
+
+        const user = await User.findById(decoded.userId).select('-password');
+        if (!user) return resHandler(res, 200, "User not found", null, "user");
+        
         return resHandler(res, 200, "User fetched successfully", {
             _id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
-            phone: user.phone
+            phone: user.phone,
+            avatar: user.avatar
         }, "user");
     } catch (error) {
         console.log("Error while getting current user", error.message);
-        return resHandler(res, 500, error.message);
+        return resHandler(res, 200, "Not authenticated", null, "user");
     }
 }
 

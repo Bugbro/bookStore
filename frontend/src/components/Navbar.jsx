@@ -90,7 +90,7 @@ const Navbar = () => {
     <div className="overflow-y-auto hide-scrollbar flex-1 flex flex-col gap-2">
       {wishlistItems.length > 0 ? (
         wishlistItems.map((id) => {
-          const item = books?.data?.find(b => b._id === id);
+          const item = books?.data?.books?.find(b => b._id === id);
           if (!item) return null;
           return (
             <div key={id} className="flex items-center gap-3 border-b border-gray-100 pb-2 mb-2 group cursor-pointer" onClick={() => { setShowWishlistPop(false); navigate(`/products/${id}`); }}>
@@ -166,10 +166,10 @@ const Navbar = () => {
             </div>
 
             {/* Search Dropdown */}
-            {isSearchFocused && searchTerm && books?.data && (
+            {isSearchFocused && searchTerm && books?.data?.books && (
               <div className="absolute top-[110%] left-0 w-full bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 overflow-hidden max-h-80 overflow-y-auto">
-                {books.data.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).length > 0 ? (
-                  books.data.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(book => (
+                {books.data.books.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).length > 0 ? (
+                  books.data.books.filter(book => book.title.toLowerCase().includes(searchTerm.toLowerCase()) || book.author.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(book => (
                     <div key={book._id} onClick={() => { setIsSearchFocused(false); navigate(`/products/${book._id}`); }} className="flex items-center gap-3 p-3 hover:bg-green-50/50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors duration-150">
                       <img src={book.images[0]} alt={book.title} className="w-10 h-14 object-cover rounded-md shadow-sm border border-gray-100" />
                       <div className="flex flex-col">

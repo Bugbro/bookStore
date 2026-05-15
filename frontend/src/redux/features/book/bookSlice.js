@@ -4,13 +4,23 @@ import api from "../../../api/axios.js";
 //async function to fetch books from the backend
 export const fetchBooks = createAsyncThunk(
     "books/fetchBooks",
-    async(searchQuery, thunkAPI) => {
+    async(arg, thunkAPI) => {
         try {
-            const url = searchQuery ? `/books?search=${searchQuery}` : "/books";
+            // Handle both old string param and new object param
+            const isObject = typeof arg === 'object' && arg !== null;
+            const searchQuery = isObject ? arg.searchQuery : (arg || "");
+            const page = isObject ? arg.page || 1 : 1;
+            const limit = isObject ? arg.limit || 10 : 10;
+
+            let url = `/books?page=${page}&limit=${limit}`;
+            if (searchQuery) {
+                url += `&search=${searchQuery}`;
+            }
+
             const response = await api.get(url);
             return response.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data || "Failed to fetch books");
+            return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch books");
         }
     }
 );

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { fetchBookById } from "../redux/features/book/bookSlice.js";
 import { addToCartThunk } from "../redux/features/cart/cartSlice.js";
 import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice.js";
-import RelatedProducts from "../components/relatedProducts.jsx";
+import RelatedProducts from "../components/RelatedProducts.jsx";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -32,7 +32,7 @@ const ProductDetails = () => {
     if (qty > 1) setQty(qty - 1);
   };
 
-  const book = books.data?.find((b) => b._id === id) || singleBook;
+  const book = books?.data?.books?.find((b) => b._id === id) || singleBook;
   console.log("product details");
   useEffect(() => {
     if (book?.images?.length > 0) {

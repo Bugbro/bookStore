@@ -9,7 +9,7 @@ const FiveColCard = () => {
   const dispatch = useDispatch();
   const { books, loading } = useSelector((state) => state.books);
   const wishlistItems = useSelector((state) => state.wishlist?.items || []);
-  const products = books.data?.slice(0, 4);
+  const products = books?.data?.books?.slice(0, 4) || [];
   // console.log(books.data);
 
 

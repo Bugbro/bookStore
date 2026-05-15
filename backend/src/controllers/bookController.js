@@ -87,7 +87,7 @@ export const updateBook = async (req, res) => {
 //for all
 export const getBooks = async (req, res) => {
     try {
-        const { search } = req.query || {};
+        const { search, page = 1, limit = 10 } = req.query || {};
         let query = {};
         if (search) {
             query = {
@@ -97,8 +97,17 @@ export const getBooks = async (req, res) => {
                 ]
             };
         }
-        const books = await Book.find(query).sort({ createdAt: -1 });
-        return resHandler(res, 200, "Books get successfully", books);
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+
+        const skip = (pageNumber - 1) * limitNumber;
+
+        const totalBooks = await Book.countDocuments(query);
+
+        const books = await Book.find(query).sort({ createdAt: -1 }).skip(skip).limit(limitNumber);
+
+        const totalPages = Math.ceil(totalBooks / limitNumber);
+        return resHandler(res, 200, "Books get successfully", { books, totalPages, totalBooks, currentPage: pageNumber });
     } catch (error) {
         console.log("Error while getting  book", error.message);
         return resHandler(res, 500, error.message);
