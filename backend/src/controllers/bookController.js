@@ -169,6 +169,7 @@ export const getRecommendationBooks = async (req, res) => {
 
         // Step 1: Call Python API
         const response = await axios.get(
+            process.env.RECOMMEND_URL_PY + `/recommend/${encodeURIComponent(bookName)}` ||
             `http://localhost:8000/recommend/${encodeURIComponent(bookName)}`
         );
 
