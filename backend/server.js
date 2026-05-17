@@ -26,9 +26,9 @@ const server = http.createServer(app);
 
 //cors setup for admin and frontend
 const allowedOrigins = [
-  "https://book-store-puce-seven.vercel.app/",
-  // "http://localhost:5173",
-  // "http://localhost:5174",
+  "https://book-store-puce-seven.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5174",
 ];
 
 app.use(cors({
@@ -59,6 +59,7 @@ app.use("/api/contact", contactLimiter, contactRouter);
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
+    methods: ["GET", "POST"],
     credentials: true,
   },
 });
