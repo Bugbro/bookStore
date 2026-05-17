@@ -7,6 +7,7 @@ import numpy as np
 app = FastAPI()
 # Allow frontend origin
 origins = [
+    "https://bookstore-8rv1.onrender.com",
     "http://localhost:5173",  # your React app
 ]
 
