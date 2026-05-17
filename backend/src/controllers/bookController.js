@@ -141,7 +141,8 @@ export const getBooksByCategory = async (req, res) => {
 
 export const getPopularBooks = async (req, res) => {
     try {
-        const response = await axios.get("http://localhost:8000/popular");
+        const baseUrl = process.env.RECOMMEND_URL_PY || "http://localhost:8000";
+        const response = await axios.get(`${baseUrl}/popular`);
 
         const titles = response.data.recommendations.map(
             (b) => b["Book-Title"] || b.title
@@ -168,9 +169,9 @@ export const getRecommendationBooks = async (req, res) => {
         const { bookName } = req.params;
 
         // Step 1: Call Python API
+        const baseUrl = process.env.RECOMMEND_URL_PY || "http://localhost:8000";
         const response = await axios.get(
-            process.env.RECOMMEND_URL_PY + `/recommend/${encodeURIComponent(bookName)}` ||
-            `http://localhost:8000/recommend/${encodeURIComponent(bookName)}`
+            `${baseUrl}/recommend/${encodeURIComponent(bookName)}`
         );
 
         const recs = response.data.recommendations;
