@@ -1,38 +1,38 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    userId:{
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
-    items:[{
-        bookId:{
+    items: [{
+        bookId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Book',
         },
         quantity: Number,
         price: Number,
     }],
-    totalAmount:{
+    totalAmount: {
         type: Number,
         required: true,
     },
-    status:{
+    status: {
         type: String,
-        enum:["pending", "processing", "shipped", "delivered"],
-        default:"pending",
+        enum: ["pending", "processing", "shipped", "delivered", "cancelled", "shipped", "returned"],
+        default: "pending",
     },
-    paymentMethod:{
+    paymentMethod: {
         type: String,
         enum: ["COD", "Online"],
         default: "COD",
     },
-    paymentId:{
+    paymentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Payment",
     },
-    deliveryAddress:{
+    deliveryAddress: {
         name: String,
         email: String,
         street: String,
@@ -41,6 +41,6 @@ const orderSchema = new mongoose.Schema({
         pincode: String,
         phone: String,
     },
-},{timestamps:true});
+}, { timestamps: true });
 
 export default mongoose.model("Order", orderSchema);

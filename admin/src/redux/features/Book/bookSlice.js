@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAllBooksAPI, addBookAPI, updateBookAPI, deleteBookAPI } from '../../../api/bookapi/bookapi.js'
 
 export const fetchAllBooks = createAsyncThunk(
-    "book/fetchAllBooks", async (_, { rejectWithValue }) => {
+    "book/fetchAllBooks", async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
         try {
-            const res = await getAllBooksAPI();
+            const res = await getAllBooksAPI(page, limit);
             return res.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Failed to fetch books");
@@ -48,6 +48,9 @@ const bookSlice = createSlice({
     name: 'book',
     initialState: {
         books: [],
+        totalPages: 1,
+        currentPage: 1,
+        totalBooks: 0,
         loading: false,
         error: null,
         isFetched: false,
@@ -66,7 +69,10 @@ const bookSlice = createSlice({
             })
             .addCase(fetchAllBooks.fulfilled, (state, action) => {
                 state.loading = false;
-                state.books = action.payload.data;
+                state.books = action.payload.data.books || action.payload.data;
+                state.totalPages = action.payload.data.totalPages || 1;
+                state.currentPage = action.payload.data.currentPage || 1;
+                state.totalBooks = action.payload.data.totalBooks || 0;
                 state.isFetched = true;
             })
             .addCase(fetchAllBooks.rejected, (state, action) => {

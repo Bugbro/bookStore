@@ -1,39 +1,54 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchOrders, updateOrderStatus } from '../redux/features/Order/orderSlice';
 
 export const Orders = () => {
+    const dispatch = useDispatch();
     const darkMode = useSelector(state => state.theme.darkMode);
+    const { ordersByRange, loading } = useSelector(state => state.order);
     const [activeTab, setActiveTab] = useState("All");
 
-    const stats = [
-        { title: "Total Orders", value: "1,240", change: "+14.4%", isPositive: true },
-        { title: "New Orders", value: "240", change: "+20%", isPositive: true },
-        { title: "Completed Orders", value: "960", change: "+85%", isPositive: true },
-        { title: "Canceled Orders", value: "87", change: "-5%", isPositive: false },
-    ];
+    useEffect(() => {
+        dispatch(fetchOrders("all"));
+    }, [dispatch]);
 
-    const mockOrders = [
-        { id: "#ORD0001", product: "Wireless Bluetooth Headphones", date: "01-01-2025", price: "49.99", payment: "Paid", status: "Delivered", statusIcon: "fa-truck" },
-        { id: "#ORD0001", product: "Men's T-Shirt", date: "01-01-2025", price: "14.99", payment: "Unpaid", status: "Pending", statusIcon: "fa-clock-rotate-left" },
-        { id: "#ORD0001", product: "Men's Leather Wallet", date: "01-01-2025", price: "49.99", payment: "Paid", status: "Delivered", statusIcon: "fa-truck" },
-        { id: "#ORD0001", product: "Memory Foam Pillow", date: "01-01-2025", price: "39.99", payment: "Paid", status: "Shipped", statusIcon: "fa-truck-fast text-black dark:text-gray-300" },
-        { id: "#ORD0001", product: "Adjustable Dumbbells", date: "01-01-2025", price: "14.99", payment: "Unpaid", status: "Pending", statusIcon: "fa-clock-rotate-left" },
-        { id: "#ORD0001", product: "Coffee Maker", date: "01-01-2025", price: "79.99", payment: "Unpaid", status: "Cancelled", statusIcon: "fa-boxes-packing text-rose-500" },
-        { id: "#ORD0001", product: "Casual Baseball Cap", date: "01-01-2025", price: "49.99", payment: "Paid", status: "Delivered", statusIcon: "fa-truck" },
-        { id: "#ORD0001", product: "Full HD Webcam", date: "01-01-2025", price: "39.99", payment: "Paid", status: "Delivered", statusIcon: "fa-truck" },
-        { id: "#ORD0001", product: "Smart LED Color Bulb", date: "01-01-2025", price: "79.99", payment: "Unpaid", status: "Delivered", statusIcon: "fa-truck" },
-        { id: "#ORD0001", product: "Men's T-Shirt", date: "01-01-2025", price: "14.99", payment: "Unpaid", status: "Delivered", statusIcon: "fa-truck" },
+    const allOrders = ordersByRange.all || [];
+
+    const stats = [
+        { title: "Total Orders", value: allOrders.length.toString(), change: "+14.4%", isPositive: true },
+        { title: "New Orders", value: allOrders.filter(o => o.status.toLowerCase() === 'pending').length.toString(), change: "+20%", isPositive: true },
+        { title: "Completed Orders", value: allOrders.filter(o => ['delivered', 'completed'].includes(o.status.toLowerCase())).length.toString(), change: "+85%", isPositive: true },
+        { title: "Canceled Orders", value: allOrders.filter(o => ['cancelled', 'canceled'].includes(o.status.toLowerCase())).length.toString(), change: "-5%", isPositive: false },
     ];
 
     const getStatusColor = (status) => {
-        switch (status) {
-            case 'Delivered': return "text-emerald-500";
-            case 'Pending': return "text-amber-500";
-            case 'Shipped': return "text-gray-800 dark:text-gray-300";
-            case 'Cancelled': return "text-rose-500";
+        switch (status?.toLowerCase()) {
+            case 'delivered': case 'completed': return "text-emerald-500";
+            case 'pending': return "text-amber-500";
+            case 'shipped': return "text-blue-500";
+            case 'cancelled': case 'canceled': return "text-rose-500";
             default: return "text-gray-500";
         }
     };
+
+    const getStatusIcon = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'delivered': case 'completed': return "fa-truck text-emerald-500";
+            case 'pending': return "fa-clock-rotate-left text-amber-500";
+            case 'shipped': return "fa-truck-fast text-blue-500";
+            case 'cancelled': case 'canceled': return "fa-boxes-packing text-rose-500";
+            default: return "fa-circle-info text-gray-500";
+        }
+    };
+
+    const filteredOrders = allOrders.filter(order => {
+        const s = order.status?.toLowerCase();
+        if (activeTab === "All") return true;
+        if (activeTab === "Completed") return s === "delivered" || s === "completed";
+        if (activeTab === "Pending") return s === "pending";
+        if (activeTab === "Canceled") return s === "cancelled" || s === "canceled";
+        return true;
+    });
 
     return (
         <div className={`fade-in p-6 ${darkMode ? "text-gray-200" : "text-[#555]"} min-h-screen ${darkMode ? "bg-gray-950" : "bg-[#f8fafb]"}`}>
@@ -112,39 +127,68 @@ export const Orders = () => {
                             </tr>
                         </thead>
                         <tbody className="text-[14px]">
-                            {mockOrders.map((o, i) => (
-                                <tr key={i} className={`border-b last:border-0 ${darkMode ? "border-gray-800 hover:bg-gray-800/50 text-gray-300" : "border-[#e2e8f0] hover:bg-gray-50/50 text-[#4a5568]"}`}>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="7" className="text-center py-10 text-gray-500">Loading orders...</td>
+                                </tr>
+                            ) : filteredOrders.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="text-center py-10 text-gray-500">No orders found.</td>
+                                </tr>
+                            ) : filteredOrders.map((o, i) => {
+                                const displayStatus = o.status.charAt(0).toUpperCase() + o.status.slice(1);
+                                
+                                return (
+                                <tr key={o._id} className={`border-b last:border-0 ${darkMode ? "border-gray-800 hover:bg-gray-800/50 text-gray-300" : "border-[#e2e8f0] hover:bg-gray-50/50 text-[#4a5568]"}`}>
                                     <td className="px-6 py-4 hidden sm:table-cell">
                                         <div className="flex items-center gap-4">
                                             <div className={`w-4 h-4 rounded border flex items-center justify-center ${darkMode ? "border-gray-600 bg-gray-800" : "border-[#cbd5e0] bg-white"} cursor-pointer`}></div>
-                                            <span className="font-medium text-[15px]">1</span>
+                                            <span className="font-medium text-[15px]">{i + 1}</span>
                                         </div>
                                     </td>
-                                    <td className={`px-6 py-4 font-medium ${darkMode ? "text-gray-200" : "text-[#2d3748]"}`}>{o.id}</td>
+                                    <td className={`px-6 py-4 font-medium ${darkMode ? "text-gray-200" : "text-[#2d3748]"}`}>#{o._id.slice(-6).toUpperCase()}</td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 border ${darkMode ? "bg-gray-800 border-gray-700 text-gray-500" : "bg-white border-[#e2e8f0] text-gray-400 shadow-sm"}`}>
-                                                <i className="fa-solid fa-image text-lg"></i>
-                                            </div>
-                                            <span className={`font-medium ${darkMode ? "text-gray-200" : "text-[#2d3748]"}`}>{o.product}</span>
+                                        <div className="flex flex-col gap-3">
+                                            {o.items?.map((item, idx) => {
+                                                const title = item?.bookId?.title || "Unknown/Deleted Book";
+                                                const image = item?.bookId?.images?.[0] || "";
+                                                return (
+                                                    <div key={idx} className="flex items-center gap-4">
+                                                        <div className={`w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 border overflow-hidden ${darkMode ? "bg-gray-800 border-gray-700 text-gray-500" : "bg-white border-[#e2e8f0] text-gray-400 shadow-sm"}`}>
+                                                            {image ? <img src={image} alt="product" className="w-full h-full object-cover" /> : <i className="fa-solid fa-image text-lg"></i>}
+                                                        </div>
+                                                        <span className={`font-medium line-clamp-1 max-w-[200px] ${darkMode ? "text-gray-200" : "text-[#2d3748]"}`} title={title}>{title}</span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">{o.date}</td>
-                                    <td className={`px-6 py-4 font-semibold ${darkMode ? "text-gray-200" : "text-[#2d3748]"}`}>{o.price}</td>
+                                    <td className="px-6 py-4">{new Date(o.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                    <td className={`px-6 py-4 font-semibold ${darkMode ? "text-gray-200" : "text-[#2d3748]"}`}>₹{o.totalAmount}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${o.payment === "Paid" ? "bg-emerald-500" : "bg-rose-500"}`}></div>
-                                            <span className="font-medium">{o.payment}</span>
+                                            <div className={`w-2 h-2 rounded-full ${o.paymentMethod?.toLowerCase() === "cod" ? "bg-amber-500" : "bg-emerald-500"}`}></div>
+                                            <span className="font-medium uppercase">{o.paymentMethod || "COD"}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className={`flex items-center gap-2 font-medium ${getStatusColor(o.status)}`}>
-                                            <i className={`fa-solid ${o.statusIcon} ${o.statusIcon.includes('text-') ? "" : getStatusColor(o.status)}`}></i>
-                                            {o.status}
+                                            <i className={`fa-solid ${getStatusIcon(o.status)}`}></i>
+                                            <select
+                                                value={o.status}
+                                                onChange={(e) => dispatch(updateOrderStatus({ id: o._id, status: e.target.value }))}
+                                                className={`bg-transparent outline-none cursor-pointer capitalize ${getStatusColor(o.status)}`}
+                                            >
+                                                {["pending", "processing", "shipped", "delivered", "cancelled", "returned"].map(status => (
+                                                    <option key={status} value={status} className={darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-800"}>
+                                                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            )})}
                         </tbody>
                     </table>
                 </div>

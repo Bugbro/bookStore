@@ -1,7 +1,7 @@
 import api from "../baseapi/api.js";
 
-export const getAllBooksAPI = () => {
-    return api.get("/books");
+export const getAllBooksAPI = (page = 1, limit = 10) => {
+    return api.get(`/books?page=${page}&limit=${limit}`);
 }
 export const addBookAPI = (data) => {
     return api.post("/books", data);

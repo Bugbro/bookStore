@@ -7,7 +7,8 @@ export const BooksList = () => {
 
     const dispatch = useDispatch();
     const darkMode = useSelector(state => state.theme.darkMode);
-    const { books } = useSelector(state => state.book);
+    const { books, totalPages } = useSelector(state => state.book);
+    const [page, setPage] = useState(1);
     const [selectedBook, setSelectedBook] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -23,10 +24,8 @@ export const BooksList = () => {
     }
 
     useEffect(() => {
-        if (books.length === 0) {
-            dispatch(fetchAllBooks());
-        }
-    }, [])
+        dispatch(fetchAllBooks({ page, limit: 10 }));
+    }, [dispatch, page]);
     return (
         <div className="fade-in">
             <div className="mb-6">
@@ -97,6 +96,38 @@ export const BooksList = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+            )}
+
+            {books.length > 0 && totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 mt-8">
+                    <button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className={`px-4 py-2 rounded-lg font-semibold transition-colors ${page === 1 ? (darkMode ? 'bg-gray-800 text-gray-600 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed') : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                    >
+                        Previous
+                    </button>
+                    
+                    <div className="flex gap-2 flex-wrap justify-center">
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setPage(i + 1)}
+                                className={`w-10 h-10 rounded-lg font-semibold transition-colors ${page === i + 1 ? 'bg-indigo-600 text-white shadow-md' : (darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className={`px-4 py-2 rounded-lg font-semibold transition-colors ${page === totalPages ? (darkMode ? 'bg-gray-800 text-gray-600 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed') : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                    >
+                        Next
+                    </button>
                 </div>
             )}
 

@@ -9,3 +9,6 @@ export const fetchAllOrdersAPI = () => {
 export const getOrders = (range) => {
     return api.get(`/orders?range=${range}`);
 }
+export const updateOrderStatusAPI = (id, status) => {
+    return api.put(`/orders/${id}`, { status });
+}

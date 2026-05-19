@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getOrders } from "../../../api/ordersapi/ordersapi.js";
+import { getOrders, updateOrderStatusAPI } from "../../../api/ordersapi/ordersapi.js";
 
 
 export const fetchOrders = createAsyncThunk(
@@ -16,6 +16,20 @@ export const fetchOrders = createAsyncThunk(
     }
 );
 
+export const updateOrderStatus = createAsyncThunk(
+    "order/updateOrderStatus",
+    async ({ id, status }, { rejectWithValue }) => {
+        try {
+            const res = await updateOrderStatusAPI(id, status);
+            return { data: res.data.data, id };
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to update order status"
+            );
+        }
+    }
+);
+
 const initialState = {
     ordersByRange: {
         today: null,
@@ -24,6 +38,7 @@ const initialState = {
         all: null,
     },
     loading: false,
+    updateStatusLoading: false,
     error: null,
 };
 
@@ -45,6 +60,27 @@ const orderSlice = createSlice({
             })
             .addCase(fetchOrders.rejected, (state, action) => {
                 state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(updateOrderStatus.pending, (state) => {
+                state.updateStatusLoading = true;
+                state.error = null;
+            })
+            .addCase(updateOrderStatus.fulfilled, (state, action) => {
+                state.updateStatusLoading = false;
+                const updatedOrder = action.payload.data;
+                // Update in all ranges if order exists
+                Object.keys(state.ordersByRange).forEach((range) => {
+                    if (state.ordersByRange[range]) {
+                        const index = state.ordersByRange[range].findIndex(o => o._id === updatedOrder._id);
+                        if (index !== -1) {
+                            state.ordersByRange[range][index] = updatedOrder;
+                        }
+                    }
+                });
+            })
+            .addCase(updateOrderStatus.rejected, (state, action) => {
+                state.updateStatusLoading = false;
                 state.error = action.payload;
             });
     },

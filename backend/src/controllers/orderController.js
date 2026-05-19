@@ -69,7 +69,7 @@ export const updateOrderStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
-        const allowedStatus = ["pending", "processing", "shipped", "delivered"];
+        const allowedStatus = ["pending", "processing", "shipped", "delivered", "cancelled", "shipped", "returned"];
         if (!allowedStatus.includes(status)) {
             return resHandler(res, 400, "Invalid status value");
         }
@@ -77,7 +77,7 @@ export const updateOrderStatus = async (req, res) => {
             id,
             { status },
             { new: true }
-        );
+        ).populate("items.bookId");
         if (!order) {
             return resHandler(res, 404, "Order not found");
         }
@@ -126,30 +126,30 @@ export const getOrders = async (req, res) => {
     }
 }
 
-// export const getTodayOrders = async (req, res) => {
-//     try {
-//         const today = new Date();
-//         today.setHours(0, 0, 0, 0);
-//         const orders = await Order.find({ createdAt: { $gte: today } }).populate("items.bookId").sort({ createdAt: -1 });
-//         if (!orders || orders.length === 0) {
-//             return resHandler(res, 404, "No orders found for today");
-//         }
-//         return resHandler(res, 200, "Today's orders retrieved successfully", orders);
-//     } catch (error) {
-//         console.log("Error while getting today's orders", error.message);
-//         return resHandler(res, 500, error.message);
-//     }
-// }
+export const getTodayOrders = async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const orders = await Order.find({ createdAt: { $gte: today } }).populate("items.bookId").sort({ createdAt: -1 });
+        if (!orders || orders.length === 0) {
+            return resHandler(res, 404, "No orders found for today");
+        }
+        return resHandler(res, 200, "Today's orders retrieved successfully", orders);
+    } catch (error) {
+        console.log("Error while getting today's orders", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
 
-// export const getAllOrders = async (req, res) => {
-//     try {
-//         const orders = await Order.find().populate("items.bookId").sort({ createdAt: -1 });
-//         if (!orders || orders.length === 0) {
-//             return resHandler(res, 404, "No orders found");
-//         }
-//         return resHandler(res, 200, "All orders retrieved successfully", orders);
-//     } catch (error) {
-//         console.log("Error while getting all orders", error.message);
-//         return resHandler(res, 500, error.message);
-//     }
-// }
+export const getAllOrders = async (req, res) => {
+    try {
+        const orders = await Order.find().populate("items.bookId").sort({ createdAt: -1 });
+        if (!orders || orders.length === 0) {
+            return resHandler(res, 404, "No orders found");
+        }
+        return resHandler(res, 200, "All orders retrieved successfully", orders);
+    } catch (error) {
+        console.log("Error while getting all orders", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
