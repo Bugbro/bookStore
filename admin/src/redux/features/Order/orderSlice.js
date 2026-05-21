@@ -4,10 +4,16 @@ import { getOrders, updateOrderStatusAPI } from "../../../api/ordersapi/ordersap
 
 export const fetchOrders = createAsyncThunk(
     "order/fetchOrders",
-    async (range = "all", { rejectWithValue }) => {
+    async (arg = {}, { rejectWithValue }) => {
         try {
-            const res = await getOrders(range);
-            return { data: res.data.data, range };
+            const params = typeof arg === "string" ? { range: arg } : arg;
+            const { range = "all", page = 1, limit = 4 } = params;
+            const res = await getOrders(range, page, limit);
+            return {
+                orders: res.data.data.orders,
+                pagination: res.data.data.pagination,
+                range,
+            };
         } catch (error) {
             return rejectWithValue(
                 error.response?.data?.message || "Failed to fetch orders"
@@ -54,9 +60,9 @@ const orderSlice = createSlice({
             .addCase(fetchOrders.fulfilled, (state, action) => {
                 state.loading = false;
 
-                const { range, data } = action.payload;
+                const { range, orders, pagination } = action.payload;
 
-                state.ordersByRange[range] = data;
+                state.ordersByRange[range] = { orders, pagination };
             })
             .addCase(fetchOrders.rejected, (state, action) => {
                 state.loading = false;
@@ -69,12 +75,13 @@ const orderSlice = createSlice({
             .addCase(updateOrderStatus.fulfilled, (state, action) => {
                 state.updateStatusLoading = false;
                 const updatedOrder = action.payload.data;
-                // Update in all ranges if order exists
+                // Update status of order in all ranges if order exists
                 Object.keys(state.ordersByRange).forEach((range) => {
-                    if (state.ordersByRange[range]) {
-                        const index = state.ordersByRange[range].findIndex(o => o._id === updatedOrder._id);
+                    const rangeData = state.ordersByRange[range];
+                    if (rangeData && Array.isArray(rangeData.orders)) {
+                        const index = rangeData.orders.findIndex(o => o._id === updatedOrder._id);
                         if (index !== -1) {
-                            state.ordersByRange[range][index] = updatedOrder;
+                            rangeData.orders[index] = updatedOrder;
                         }
                     }
                 });

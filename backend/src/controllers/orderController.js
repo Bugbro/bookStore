@@ -90,7 +90,7 @@ export const updateOrderStatus = async (req, res) => {
 
 export const getOrders = async (req, res) => {
     try {
-        const { range } = req.query;
+        const { range = "all", page = 1, limit = 4, } = req.query;
         let startDate;
         const now = new Date();
         switch (range) {
@@ -112,14 +112,28 @@ export const getOrders = async (req, res) => {
         if (startDate) {
             filter.createdAt = { $gte: startDate };
         }
+        const skip = (page - 1) * limit;
         const orders = await Order.find(filter)
             .populate("items.bookId")
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(Number(limit));
 
         if (!orders || orders.length === 0) {
             return resHandler(res, 404, `No ${range || "all"} orders found`);
         }
-        return resHandler(res, 200, `${range || "All"} orders retrieved successfully`, orders);
+
+        const totalOrders = await Order.countDocuments(filter);
+
+        return resHandler(res, 200, `${range || "All"} orders retrieved successfully`, {
+            orders,
+            pagination: {
+                total: totalOrders,
+                currentPage: Number(page),
+                totalPages: Math.ceil(totalOrders / limit),
+                limit: Number(limit),
+            }
+        });
     } catch (error) {
         console.log("Error while  orders", error.message);
         return resHandler(res, 500, error.message);

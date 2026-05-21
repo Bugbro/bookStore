@@ -34,7 +34,7 @@ export default function DashboardContent() {
     const darkMode = useSelector(state => state.theme.darkMode);
     const { books, loading: bookLoading } = useSelector(state => state.book);
     const { ordersByRange, loading: orderLoading } = useSelector(state => state.order || {});
-    const todayOrders = ordersByRange?.today || [];
+    const todayOrders = ordersByRange?.today?.orders || [];
     const { totalRevenue, loading: totalRevenueLoading } = useSelector(state => state.adminDashboard || {});
     const { activeUsers } = useSelector((state) => state.socket);
 
@@ -42,7 +42,7 @@ export default function DashboardContent() {
         if (!books || books.length === 0) {
             dispatch(fetchAllBooks());
         }
-        if (ordersByRange?.today === undefined) {
+        if (!ordersByRange?.today?.orders) {
             dispatch(fetchOrders("today"));
         }
         if (totalRevenue === undefined) {
