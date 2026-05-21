@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AddBook from './AddBook.jsx';
+import RecentOrders from './RecentOrders.jsx';
 import { fetchAllBooks } from '../redux/features/Book/bookSlice.js';
 import { fetchOrders } from '../redux/features/Order/orderSlice.js';
 import { getTotalRevenue } from '../redux/features/Admin/adminDashboardSlice.js';
@@ -43,7 +44,7 @@ export default function DashboardContent() {
             dispatch(fetchAllBooks());
         }
         if (!ordersByRange?.today?.orders) {
-            dispatch(fetchOrders("today"));
+            dispatch(fetchOrders({ range: "today", page: 1, limit: 10 }));
         }
         if (totalRevenue === undefined) {
             dispatch(getTotalRevenue());
@@ -84,49 +85,7 @@ export default function DashboardContent() {
             {/* MIDDLE ROW */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-6">
 
-                {/* Recent Orders */}
-                <div className={`xl:col-span-2 rounded-2xl ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"} border p-5`}>
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className={`font-semibold ${darkMode ? "text-white" : "text-gray-800"}`}>Recent Orders</h2>
-                        <button className="text-xs text-indigo-600 hover:underline font-medium">View All <i className="fa-solid fa-arrow-right text-xs ml-1"></i></button>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className={`${darkMode ? "text-gray-500" : "text-gray-400"} text-xs uppercase`}>
-                                    <th className="text-left pb-3 font-medium">Order ID</th>
-                                    <th className="text-left pb-3 font-medium">Customer</th>
-                                    <th className="text-left pb-3 font-medium hidden md:table-cell">Book</th>
-                                    <th className="text-left pb-3 font-medium">Amount</th>
-                                    <th className="text-left pb-3 font-medium">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {todayOrders.slice(0, 5).map((o, i) => {
-                                    const statusCapitalized = o.status ? o.status.charAt(0).toUpperCase() + o.status.slice(1) : "Pending";
-                                    const bookName = o.items && o.items.length > 0 ? o.items[0]?.bookId?.title : "N/A";
-                                    const finalBookDisplay = o.items && o.items.length > 1 ? `${bookName} +${o.items.length - 1}` : bookName;
-                                    return (
-                                        <tr key={o._id || i} className={`border-t ${darkMode ? "border-gray-800" : "border-gray-50"}`}>
-                                            <td className="py-3 text-indigo-500 font-medium">#{o._id ? o._id.slice(-6).toUpperCase() : "N/A"}</td>
-                                            <td className={`py-3 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{o.deliveryAddress?.name || "N/A"}</td>
-                                            <td className={`py-3 hidden md:table-cell ${darkMode ? "text-gray-400" : "text-gray-500"} text-xs`}>{finalBookDisplay}</td>
-                                            <td className={`py-3 font-semibold ${darkMode ? "text-white" : "text-gray-800"}`}>₹{o.totalAmount}</td>
-                                            <td className="py-3">
-                                                <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusColor[statusCapitalized] || statusColor.Pending}`}>{statusCapitalized}</span>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                                {todayOrders.length === 0 && !orderLoading && (
-                                    <tr>
-                                        <td colSpan="5" className={`py-4 text-center text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>No orders today.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <RecentOrders />
 
                 {/* Quick Actions */}
                 <div className={`rounded-2xl ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"} border p-5`}>
