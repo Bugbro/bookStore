@@ -5,9 +5,6 @@ const navItems = [
     { icon: "fa-gauge-high", label: "Dashboard", id: "dashboard", path: "/dashboard" },
     { icon: "fa-book-open", label: "Books", id: "books", path: "/books" },
     { icon: "fa-cart-shopping", label: "Orders", id: "orders", path: "/orders" },
-    { icon: "fa-users", label: "Users", id: "users", path: "/users" },
-    { icon: "fa-tags", label: "Categories", id: "categories", path: "/categories" },
-    { icon: "fa-chart-line", label: "Analytics", id: "analytics", path: "/analytics" },
     { icon: "fa-star", label: "Reviews", id: "reviews", path: "/reviews" },
     { icon: "fa-gear", label: "Settings", id: "settings", path: "/settings" },
 ];

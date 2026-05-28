@@ -103,7 +103,8 @@ export const Orders = () => {
                 <div className="flex flex-col xl:flex-row items-center justify-between p-5 gap-4">
                     {/* Tabs */}
                     <div className="flex items-center gap-1 w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0">
-                        {["All order", "Completed", "Pending", "Canceled"].map((tab) => {
+                        {/* ["All order", "Completed", "Pending", "Canceled"] can add this later */}
+                        {["All order"].map((tab) => {
                             const isActive = activeTab === tab || (tab === "All order" && activeTab === "All");
                             return (
                                 <button
@@ -120,22 +121,7 @@ export const Orders = () => {
                         })}
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-3 w-full xl:w-auto">
-                        <div className={`flex items-center gap-2 px-3 h-10 rounded-lg border flex-grow xl:flex-grow-0 xl:w-[320px] transition-colors ${darkMode ? "bg-gray-800 border-gray-700 focus-within:border-emerald-500/50" : "bg-[#f8fafb] border-[#eaeef2] focus-within:border-[#4caf50]/50"}`}>
-                            <i className={`fa-solid fa-magnifying-glass text-sm ${darkMode ? "text-gray-400" : "text-[#a0aec0]"}`}></i>
-                            <input type="text" placeholder="Search order report" className={`bg-transparent text-[14px] w-full outline-none ${darkMode ? "text-white placeholder-gray-500" : "text-[#2d3748] placeholder-[#a0aec0]"}`} />
-                        </div>
-                        <button className={`w-10 h-10 flex items-center justify-center rounded-lg border transition-colors ${darkMode ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-[#eaeef2] text-[#718096] hover:bg-gray-50"}`}>
-                            <i className="fa-solid fa-filter text-sm"></i>
-                        </button>
-                        <button className={`w-10 h-10 flex items-center justify-center rounded-lg border transition-colors ${darkMode ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-[#eaeef2] text-[#718096] hover:bg-gray-50"}`}>
-                            <i className="fa-solid fa-arrow-down-wide-short text-sm"></i>
-                        </button>
-                        <button className={`w-10 h-10 flex items-center justify-center rounded-lg border transition-colors ${darkMode ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-[#eaeef2] text-[#718096] hover:bg-gray-50"}`}>
-                            <i className="fa-solid fa-ellipsis text-sm"></i>
-                        </button>
-                    </div>
+                        
                 </div>
 
                 {/* TABLE */}
