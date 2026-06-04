@@ -109,3 +109,63 @@ export const getProductReviews = async (req, res) => {
         return resHandler(res, 500, error.message)
     }
 }
+
+// user review on user profile
+export const getUserReviews = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+        const [reviews, totalReviews] = await Promise.all([
+            Review.find({ userId })
+                .populate("bookId", "title images")
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+
+            Review.countDocuments({ userId }),
+        ]);
+
+        const totalPages = Math.ceil(totalReviews / limit);
+        return resHandler(res, 200, "Reviews fetched successfully", {
+            reviews,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalReviews,
+                limit,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+            },
+        });
+    } catch (error) {
+        console.log("Error while fetching user reviews.", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
+
+/**
+ * 
+ * 4. User delete it own review
+ * 
+ */
+export const deleteMyReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        const userId = req.user.id;
+        if (!reviewId) return resHandler(res, 400, "Review id is required");
+        if (!userId) return resHandler(res, 400, "User id is required");
+        const deleteReview = await Review.findOneAndDelete({
+            _id: reviewId,
+            userId,
+        });
+        if (!deleteReview) {
+            return resHandler(res, 404, "Review not found or unauthorized.");
+        }
+        return resHandler(res, 200, "Review deleted successfully");
+    } catch (error) {
+        console.log("Error while deleting user review.", error.message);
+        return resHandler(res, 500, error.message);
+    }
+}
