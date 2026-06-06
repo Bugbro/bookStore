@@ -5,6 +5,7 @@ import { fetchBookById } from "../redux/features/book/bookSlice.js";
 import { addToCartThunk } from "../redux/features/cart/cartSlice.js";
 import { toggleWishlist } from "../redux/features/wishlist/wishlistSlice.js";
 import RelatedProducts from "../components/RelatedProducts.jsx";
+import Review from "../components/Review/Review.jsx";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -33,7 +34,6 @@ const ProductDetails = () => {
   };
 
   const book = books?.data?.books?.find((b) => b._id === id) || singleBook;
-  console.log("product details");
   useEffect(() => {
     if (book?.images?.length > 0) {
       setMainImage(book.images[0]);
@@ -48,9 +48,9 @@ const ProductDetails = () => {
 
   if (loading) return <h3>Loading please wait</h3>;
   return (
-    <div className="px-28 py-3 my-10">
+    <div className="px-6  lg:px-28 py-3 my-10">
       <h2>Products</h2>
-      <div className="flex items-start gap-6 my-4 group">
+      <div className="flex flex-col md:flex-row items-start gap-6 my-4 group">
         {/* image container */}
         <div className="flex flex-col gap-2 py-2 ">
           <div className="relative">
@@ -128,6 +128,7 @@ const ProductDetails = () => {
           <p>Categories: <span className="text-sm font-semibold capitalize">{book?.category}</span></p>
         </div>
       </div>
+      <Review />
 
       <RelatedProducts bookCategory={book.category} bookId={book._id} />
     </div>

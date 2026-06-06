@@ -12,7 +12,7 @@ const RelatedProducts = ({ bookCategory, bookId }) => {
   const showRelatedBooks = relatedBooks.data?.filter(
     (item) => item._id !== bookId,
   );
-  console.log(showRelatedBooks);
+  // console.log(showRelatedBooks);
 
   const prevCategory = useRef(null);
 
@@ -24,8 +24,6 @@ const RelatedProducts = ({ bookCategory, bookId }) => {
       prevCategory.current = bookCategory;
     }
   }, [bookCategory]);
-
-  console.log(relatedBooks);
 
   return (
     <div className="text-xl font-semibold my-10">
