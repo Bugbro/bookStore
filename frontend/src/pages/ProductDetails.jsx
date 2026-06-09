@@ -128,7 +128,9 @@ const ProductDetails = () => {
           <p>Categories: <span className="text-sm font-semibold capitalize">{book?.category}</span></p>
         </div>
       </div>
-      <Review />
+
+      {/* later add this feature */}
+      {/* <Review /> */}
 
       <RelatedProducts bookCategory={book.category} bookId={book._id} />
     </div>
