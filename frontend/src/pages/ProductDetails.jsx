@@ -11,7 +11,7 @@ const ProductDetails = () => {
   const { id } = useParams();
 
   const dispatch = useDispatch();
-  const { books, singleBook, loading } = useSelector((state) => state.books);
+  const { books, singleBook, loading, error } = useSelector((state) => state.books);
   const wishlistItems = useSelector((state) => state.wishlist?.items || []);
   const [qty, setQty] = useState(1);
   const [mainImage, setMainImage] = useState("");
@@ -46,7 +46,10 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  if (loading) return <h3>Loading please wait</h3>;
+  if (loading || (!book && !error)) return <h3>Loading please wait</h3>;
+  if (error) return <h3>Error: {error?.message || error || "Failed to load book."}</h3>;
+  if (!book) return <h3>Book not found</h3>;
+
   return (
     <div className="px-6  lg:px-28 py-3 my-10">
       <h2>Products</h2>
@@ -132,7 +135,7 @@ const ProductDetails = () => {
       {/* later add this feature */}
       {/* <Review /> */}
 
-      <RelatedProducts bookCategory={book.category} bookId={book._id} />
+      <RelatedProducts bookCategory={book?.category} bookId={book?._id} />
     </div>
   );
 };

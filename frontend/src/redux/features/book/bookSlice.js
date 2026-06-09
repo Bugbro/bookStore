@@ -27,19 +27,27 @@ export const fetchBooks = createAsyncThunk(
 
 export const fetchBookById = createAsyncThunk(
     "books/fetchBookById",
-    async (id)=> {
-        const response = await api.get(`/books/${id}`);
-        return response.data
+    async (id, thunkAPI)=> {
+        try {
+            const response = await api.get(`/books/${id}`);
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch book");
+        }
     }
 );
 
 export const fetchRelatedBooks = createAsyncThunk(
     "books/fetchRelatedBooks",
-    async(category) =>{
-        const response = await api.get(`/books/category/${category}`);
-        return response.data;
+    async(category, thunkAPI) =>{
+        try {
+            const response = await api.get(`/books/category/${category}`);
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response?.data || "Failed to fetch related books");
+        }
     }
-)
+);
 
 const bookSlice = createSlice({
     name: "books",
@@ -85,7 +93,7 @@ const bookSlice = createSlice({
             state.relatedBookLoading = false;
             state.relatedBooks = action.payload;
         })
-        .addCase(fetchRelatedBooks.rejected, (state)=>{
+        .addCase(fetchRelatedBooks.rejected, (state, action)=>{
             state.relatedBookLoading = false;
             state.error = action.payload;
         });

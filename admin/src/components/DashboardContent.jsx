@@ -5,6 +5,8 @@ import RecentOrders from './RecentOrders.jsx';
 import { fetchAllBooks } from '../redux/features/Book/bookSlice.js';
 import { fetchOrders } from '../redux/features/Order/orderSlice.js';
 import { getTotalRevenue } from '../redux/features/Admin/adminDashboardSlice.js';
+import { useNavigate } from "react-router-dom";
+import { BooksList } from './BooksList.jsx';
 
 
 const recentOrders = [
@@ -31,13 +33,15 @@ const statusColor = {
 
 export default function DashboardContent() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
     const darkMode = useSelector(state => state.theme.darkMode);
-    const { books, loading: bookLoading } = useSelector(state => state.book);
+    const { books, totalBooks, loading: bookLoading } = useSelector(state => state.book);
     const { ordersByRange, loading: orderLoading } = useSelector(state => state.order || {});
     const todayOrders = ordersByRange?.today?.orders || [];
     const { totalRevenue, loading: totalRevenueLoading } = useSelector(state => state.adminDashboard || {});
     const { activeUsers } = useSelector((state) => state.socket);
+    console.log(books);
 
     useEffect(() => {
         if (!books || books.length === 0) {
@@ -52,7 +56,7 @@ export default function DashboardContent() {
     }, [dispatch, books, ordersByRange]);
 
     const stats = [
-        { label: "Total Books", value: bookLoading ? "...." : books?.length, icon: "fa-book-open", change: "+12%", color: "#f59e0b" },
+        { label: "Total Books", value: bookLoading ? "...." : totalBooks, icon: "fa-book-open", change: "+12%", color: "#f59e0b" },
         { label: "Orders Today", value: orderLoading ? "...." : todayOrders?.length, icon: "fa-shopping-cart", change: "+8%", color: "#10b981" },
         { label: "Total Revenue", value: totalRevenueLoading ? "...." : totalRevenue, icon: "fa-indian-rupee-sign", change: "+21%", color: "#6366f1" },
         { label: "Active Users", value: activeUsers, icon: "fa-users", change: "+5%", color: "#ef4444" },
@@ -63,7 +67,7 @@ export default function DashboardContent() {
             {/* Page Title */}
             <div className="mb-6">
                 <h1 className={`brand-font text-2xl font-bold ${darkMode ? "text-white" : "text-gray-800"}`}>Dashboard Overview</h1>
-                <p className={`text-sm mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Thursday, 26 March 2026 — Welcome back, Admin 👋</p>
+                <p className={`text-sm mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Thursday, 26 March 2026 — Welcome back, Admin</p>
             </div>
 
             {/* STATS GRID */}
@@ -74,7 +78,7 @@ export default function DashboardContent() {
                             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: s.color + "18" }}>
                                 <i className={`fa-solid ${s.icon}`} style={{ color: s.color }}></i>
                             </div>
-                            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{s.change}</span>
+                            {/* <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{s.change}</span> */}
                         </div>
                         <p className={`text-2xl font-bold ${darkMode ? "text-white" : "text-gray-800"}`}>{s.value}</p>
                         <p className={`text-xs mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{s.label}</p>
@@ -93,9 +97,9 @@ export default function DashboardContent() {
                     <div className="space-y-2">
                         {[
                             { icon: "fa-plus", label: "Add New Book", color: "bg-indigo-600 hover:bg-indigo-700", action: () => setIsAddBookModalOpen(true) },
-                            { icon: "fa-truck", label: "Process Orders", color: "bg-emerald-600 hover:bg-emerald-700" },
-                            { icon: "fa-tag", label: "Manage Discounts", color: "bg-amber-500 hover:bg-amber-600" },
-                            { icon: "fa-download", label: "Export Reports", color: "bg-slate-600 hover:bg-slate-700" },
+                            { icon: "fa-truck", label: "Orders", color: "bg-emerald-600 hover:bg-emerald-700", action: () => navigate("/orders") },
+                            // { icon: "fa-tag", label: "Manage Discounts", color: "bg-amber-500 hover:bg-amber-600" },
+                            // { icon: "fa-download", label: "Export Reports", color: "bg-slate-600 hover:bg-slate-700" },
                             { icon: "fa-bullhorn", label: "Send Newsletter", color: "bg-purple-600 hover:bg-purple-700" },
                         ].map((a, i) => (
                             <button key={i} onClick={a.action} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-white text-sm font-medium transition-colors ${a.color}`}>
@@ -113,57 +117,8 @@ export default function DashboardContent() {
                 </div>
             </div>
 
-            {/* TOP BOOKS TABLE */}
-            <div className={`rounded-2xl ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"} border p-5`}>
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className={`font-semibold ${darkMode ? "text-white" : "text-gray-800"}`}>Top Selling Books</h2>
-                    <button className="text-xs text-indigo-600 hover:underline font-medium">Manage Inventory <i className="fa-solid fa-arrow-right text-xs ml-1"></i></button>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className={`text-xs uppercase ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
-                                <th className="text-left pb-3 font-medium">#</th>
-                                <th className="text-left pb-3 font-medium">Title</th>
-                                <th className="text-left pb-3 font-medium">Author</th>
-                                <th className="text-left pb-3 font-medium">Price</th>
-                                <th className="text-left pb-3 font-medium">Sales</th>
-                                <th className="text-left pb-3 font-medium">Stock</th>
-                                <th className="text-left pb-3 font-medium">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topBooks.map((b, i) => (
-                                <tr key={i} className={`border-t ${darkMode ? "border-gray-800" : "border-gray-50"}`}>
-                                    <td className={`py-3 text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>{i + 1}</td>
-                                    <td className={`py-3 font-medium ${darkMode ? "text-white" : "text-gray-800"}`}>{b.title}</td>
-                                    <td className={`py-3 ${darkMode ? "text-gray-400" : "text-gray-500"} text-xs`}>{b.author}</td>
-                                    <td className={`py-3 font-semibold ${darkMode ? "text-indigo-400" : "text-indigo-600"}`}>{b.price}</td>
-                                    <td className="py-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className={`h-1.5 rounded-full ${darkMode ? "bg-gray-800" : "bg-gray-100"} w-20`}>
-                                                <div className="h-1.5 rounded-full bg-indigo-500" style={{ width: `${(b.sales / 320) * 100}%` }}></div>
-                                            </div>
-                                            <span className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{b.sales}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-3">
-                                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${b.stock === 0 ? "bg-rose-100 text-rose-600" : b.stock < 15 ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"}`}>
-                                            {b.stock === 0 ? "Out of Stock" : `${b.stock} left`}
-                                        </span>
-                                    </td>
-                                    <td className="py-3">
-                                        <div className="flex items-center gap-2">
-                                            <button className="p-1.5 rounded-lg text-indigo-500 hover:bg-indigo-50 transition-colors"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
-                                            <button className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors"><i className="fa-solid fa-trash text-xs"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            {/* books component */}
+            <BooksList />
 
             {/* Modal Components */}
             {isAddBookModalOpen && <AddBook onClose={() => setIsAddBookModalOpen(false)} />}

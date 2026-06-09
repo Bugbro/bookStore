@@ -5,15 +5,13 @@ const navItems = [
     { icon: "fa-gauge-high", label: "Dashboard", id: "dashboard", path: "/dashboard" },
     { icon: "fa-book-open", label: "Books", id: "books", path: "/books" },
     { icon: "fa-cart-shopping", label: "Orders", id: "orders", path: "/orders" },
-    { icon: "fa-star", label: "Reviews", id: "reviews", path: "/reviews" },
-    { icon: "fa-gear", label: "Settings", id: "settings", path: "/settings" },
+    // { icon: "fa-star", label: "Reviews", id: "reviews", path: "/reviews" },
+    // { icon: "fa-gear", label: "Settings", id: "settings", path: "/settings" },
 ];
 
 export const SideBar = ({ sidebarOpen }) => {
     const darkMode = useSelector(state => state.theme.darkMode);
     const location = useLocation();
-
-
 
     return (
         <aside className={`${sidebarOpen ? "w-64" : "w-16"} sidebar-transition flex-shrink-0 ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"} border-r flex flex-col`}>
@@ -22,7 +20,7 @@ export const SideBar = ({ sidebarOpen }) => {
                 <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0">
                     <i className="fa-solid fa-book-open text-white text-sm"></i>
                 </div>
-                {sidebarOpen && <span className="brand-font text-xl font-bold text-indigo-600 truncate">BookHaven</span>}
+                {sidebarOpen && <span className="brand-font text-xl font-bold text-indigo-600 truncate">bookStore</span>}
             </div>
 
             {/* Nav */}
@@ -53,7 +51,7 @@ export const SideBar = ({ sidebarOpen }) => {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">A</div>
                     <div className="overflow-hidden">
                         <p className="text-xs font-semibold truncate">Admin</p>
-                        <p className="text-xs text-gray-400 truncate">admin@bookhaven.in</p>
+                        {/* <p className="text-xs text-gray-400 truncate">admin@bookhaven.in</p> */}
                     </div>
                 </div>
             )}

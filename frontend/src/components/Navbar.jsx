@@ -535,7 +535,7 @@ const Navbar = () => {
           <Link to="/">Home</Link>
           <Link to="/products">Products</Link>
           <Link to="/recommend">Recommend</Link>
-          <Link to="/blog">Blog</Link>
+          {/* <Link to="/blog">Blog</Link> */}
           <Link to="/contact">Contact</Link>
           <Link to="/about">About Us</Link>
         </div>
@@ -559,7 +559,7 @@ const Navbar = () => {
           <Link to="/" onClick={() => setShowMobileMenu(false)}>Home</Link>
           <Link to="/products" onClick={() => setShowMobileMenu(false)}>Products</Link>
           <Link to="/recommend" onClick={() => setShowMobileMenu(false)}>Recommend</Link>
-          <Link to="/blog" onClick={() => setShowMobileMenu(false)}>Blog</Link>
+          {/* <Link to="/blog" onClick={() => setShowMobileMenu(false)}>Blog</Link> */}
           <Link to="/contact" onClick={() => setShowMobileMenu(false)}>Contact</Link>
           <Link to="/about" onClick={() => setShowMobileMenu(false)}>About Us</Link>
         </div>

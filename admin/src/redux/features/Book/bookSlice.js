@@ -91,6 +91,7 @@ const bookSlice = createSlice({
                     newBook,
                     ...state.books.filter(book => book._id !== newBook._id)
                 ];
+                state.totalBooks += 1;
             })
             .addCase(addBook.rejected, (state, action) => {
                 state.loading = false;
@@ -121,6 +122,7 @@ const bookSlice = createSlice({
                 state.loading = false;
                 const id = action.payload;
                 state.books = state.books.filter(book => book._id !== id);
+                state.totalBooks = Math.max(0, state.totalBooks - 1);
             })
             .addCase(deleteBook.rejected, (state, action) => {
                 state.loading = false;
